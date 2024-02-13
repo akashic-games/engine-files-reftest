@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="UTF-8">
+	<title><%- title %></title>
+	<link rel="icon" href="/favicon.ico" type="image/vnd.microsoft.icon">
+</head>
+<body>
+	<%
+		const testTypes = Object.keys(reftestResultMap);
+		// reftestResultMapには1つ以上testTypeキーがある且つ「あるtestTypeキーにはあるコンテンツの結果があるが別のtestTypeキーには無い」というパターンは無いという前提で処理を行う
+		const contentDirPaths = Object.keys(reftestResultMap[testTypes[0]]).sort();
+	%>
+	<h1><%- title %></h1>
+	<p>作成日：<%= new Date() %></p>
+	<table>
+		<tr>
+			<th>コンテンツ名</th>
+			<% for (var testType of testTypes) { %>
+				<th><%= testType %></th>
+			<% } %>
+		</tr>
+		<% for (var contentDirPath of contentDirPaths) { %>
+			<tr>
+				<td><%= contentDirPath %></td>
+				<% for (var testType of testTypes) { %>
+					<% const status = reftestResultMap[testType][contentDirPath].status; %>
+					<td bgColor="<%= (status === 'succeeded') ? 'green' : ((status === 'failed') ? 'red' : 'yellow') %>">
+						<% if (status === 'skipped') { %>
+							-
+						<% } else { %>
+							<a href="./<%= contentDirPath %>/<%= testType %>"><%= status %></a>
+						<% } %>
+					</td>
+				<% } %>
+			</tr>
+		<% } %>
+	</table>
+</body>
+</html>

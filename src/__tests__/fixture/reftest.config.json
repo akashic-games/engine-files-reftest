@@ -1,0 +1,6 @@
+{
+    "testType": "serve",
+    "targets": [
+      "./sample1/reftest.entry.json"
+    ]
+}

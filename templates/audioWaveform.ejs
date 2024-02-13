@@ -1,0 +1,27 @@
+<!--
+埋め込まれた音声の波形を WaveSurfer.js で描画するだけの HTML 。
+これを puppeteer で開いてスクリーンショットを取ることで音声の波形を画像化するために使う。
+ref: src/audioExtractor/
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="UTF-8">
+	<title>ゲーム音声の波形画像</title>
+	<script src="<%= waveSurferPath %>"></script>
+</head>
+<body>
+	<div id="<%= containerId %>"></div>
+	<script>
+		window.drawnAudioImage = false;
+		const wavesurfer = WaveSurfer.create({
+			container: '#<%= containerId %>',
+			waveColor: '#137a7f',
+		});
+		wavesurfer.load('<%= playVideoPath %>');
+		wavesurfer.on("ready", () => {
+			window.drawnAudioImage = true;
+		});
+	</script>
+</body>
+</html>

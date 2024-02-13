@@ -1,0 +1,8 @@
+{
+    "scenario": {
+        "type": "playlog",
+        "path": "./playlog.json"
+    },
+    "executionMode": "passive",
+    "expectedDirPath": "./expected"
+}
