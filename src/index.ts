@@ -222,6 +222,10 @@ commander
 	} catch (e) {
 		console.error(e);
 		process.exit(1);
+	} finally {
+		console.log("Completed Reftest");
+		// 環境によってはreftestのプロセスが終了しないことがあるので、明示的に終了させる
+		process.exit(0);
 	}
 })();
 

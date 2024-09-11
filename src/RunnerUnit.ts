@@ -89,7 +89,7 @@ export async function withRunnerUnit<T>(param: GetRunnerUnitParameterObject, fun
 	try {
 		return await fun(runnerUnit);
 	} finally {
-		runnerUnit.dispose();
+		await runnerUnit.dispose();
 	}
 }
 
