@@ -57,7 +57,9 @@ export class AkashicServe {
 			this._binFile.path,
 			"-p",
 			port.toString(),
-			"--no-open-browser"
+			"--no-open-browser",
+			"--hostname",
+			"0.0.0.0"
 		].concat(param.options ?? []);
 		const childProcess = spawn("node", args, { cwd: param.contentDirPath, env: { ...process.env, ...param.env } });
 
