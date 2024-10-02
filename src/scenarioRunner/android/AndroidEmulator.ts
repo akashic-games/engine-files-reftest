@@ -60,7 +60,5 @@ export async function createAndroidEmulator(param: AndroidEmulatorParameterObjec
 		resolve();
 	};
 	await withTimeLimit(TIMEOUT, "android emulator can't start", () => untilResolve(() => new Promise(checkStarting), 500));
-	const testCommand = execSync("cat /system/etc/hosts").toString();
-	console.log("cat /system/etc/hosts", testCommand);
 	return new AndroidEmulatorProcess(process);
 }
