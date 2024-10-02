@@ -29,6 +29,7 @@ interface AndroidEmulatorParameterObject {
 export async function createAndroidEmulator(param: AndroidEmulatorParameterObject): Promise<AndroidEmulatorProcess> {
 	let emulatorName = param.emulatorName;
 	const emulators = execSync("emulator -list-avds").toString().split(os.EOL).filter(name => name !== "");
+	console.log("createAndroidEmulator", emulatorName, emulators);
 	if (!emulatorName) {
 		// emulatorが指定されていない時は最初に作られたemulatorをそのまま利用する
 		if (emulators.length < 1) {
@@ -44,6 +45,7 @@ export async function createAndroidEmulator(param: AndroidEmulatorParameterObjec
 	const checkStarting = async (resolve: (value?: unknown) => void, reject: (err?: Error) => void): Promise<void> => {
 		// emulatorが起動していることを確認
 		const emulatorsInfo = execSync("adb devices").toString().split(os.EOL).filter(name => name !== "");
+		console.log("emulatorsInfo", emulatorsInfo);
 		// emulatorが無くても「List of devices attached」という文字列だけは表示されるので要素数が2以上の時をemulatorが存在すると判定
 		if (emulatorsInfo.length < 2) {
 			reject(new Error("not found emulators"));
@@ -58,5 +60,7 @@ export async function createAndroidEmulator(param: AndroidEmulatorParameterObjec
 		resolve();
 	};
 	await withTimeLimit(TIMEOUT, "android emulator can't start", () => untilResolve(() => new Promise(checkStarting), 500));
+	const testCommand = execSync("adb pull /system/etc/hosts");
+	console.log("adb pull /system/etc/hosts", testCommand);
 	return new AndroidEmulatorProcess(process);
 }

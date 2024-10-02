@@ -70,10 +70,8 @@ export class AkashicServe {
 		console.log("setup server. port:" + port);
 		await untilResolve(() => fetch(`http://localhost:${port}/api/plays/0`), 500); // serveが起動するのを待つ
 		const res1 = await fetch(`http://localhost:${port}/contents/0/content.raw.json`);
-		const res2 = await fetch(`http://${param.hostname}:${port}/contents/0/content.raw.json`);
 		const res1Json = await res1.json();
-		const res2Json = await res2.json();
-		console.log("!!!!!contents/0/content.raw.json!!!!!!!", res1Json, res2Json);
+		console.log("!!!!!contents/0/content.raw.json!!!!!!!", res1Json);
 		return new AkashicServeProcess(childProcess, `http://${param.hostname ?? "localhost"}:${port}`);
 	}
 
