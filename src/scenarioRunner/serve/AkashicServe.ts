@@ -50,8 +50,7 @@ export class AkashicServe {
 	}
 
 	async start(param: StartAkashicServeParameterObject): Promise<AkashicServeProcess> {
-		// test: port固定
-		const port = 3333; //await getPort();
+		const port = await getPort();
 		console.log(`akashic-cli-serve version: ${this._version}`);
 		const args = [
 			"--unhandled-rejections=strict",

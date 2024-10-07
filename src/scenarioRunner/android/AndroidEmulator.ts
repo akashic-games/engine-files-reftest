@@ -60,7 +60,5 @@ export async function createAndroidEmulator(param: AndroidEmulatorParameterObjec
 		resolve();
 	};
 	await withTimeLimit(TIMEOUT, "android emulator can't start", () => untilResolve(() => new Promise(checkStarting), 500));
-	// test
-	execSync("adb reverse tcp:8080 tcp:8080");
 	return new AndroidEmulatorProcess(process);
 }
