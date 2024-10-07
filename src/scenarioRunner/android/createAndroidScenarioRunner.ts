@@ -96,7 +96,9 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 					});
 					// passiveモードでコンテンツを起動するための処理
 					const urlField = await client.$("id:url");
-					await urlField.setValue(`${serveProcess.url}/contents/0/content.raw.json`);
+					// テストアプリから外部と接続できているかのテスト
+					await urlField.setValue(`https://resource.dev.aws.coe.nicovideo.jp/coe/contents/v3-sample-game/0.0.1/content.json`);
+					//await urlField.setValue(`${serveProcess.url}/contents/0/content.raw.json`);
 					const button = await client.$("id:connect");
 					await button.click();
 
