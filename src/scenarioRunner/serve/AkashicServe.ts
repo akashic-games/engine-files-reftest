@@ -50,7 +50,8 @@ export class AkashicServe {
 	}
 
 	async start(param: StartAkashicServeParameterObject): Promise<AkashicServeProcess> {
-		const port = await getPort();
+		// test: port固定
+		const port = 3333; //await getPort();
 		console.log(`akashic-cli-serve version: ${this._version}`);
 		const args = [
 			"--unhandled-rejections=strict",
@@ -58,8 +59,6 @@ export class AkashicServe {
 			"-p",
 			port.toString(),
 			"--no-open-browser",
-			"--hostname",
-			"0.0.0.0"
 		].concat(param.options ?? []);
 		const childProcess = spawn("node", args, { cwd: param.contentDirPath, env: { ...process.env, ...param.env } });
 
