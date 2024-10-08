@@ -47,7 +47,7 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 			const screenshots: Screenshot[] = [];
 			// androidエミュレータ上では localhost は 10.0.2.2 になるので、hostとしてlocalhostの代わりに10.0.2.2を指定
 			const localhostIp = "127.0.0.1";
-			const contentOutputReceiver = await createContentOutputReceiver("localhost");
+			const contentOutputReceiver = await createContentOutputReceiver(localhostIp);
 			const consoleApiUrl = `${contentOutputReceiver.url}/console`;
 			const playlogJsonPath = injectOutputReceiverUrl(scenarioPath, consoleApiUrl);
 			// reftest実行時のoriginがnullになってしまうため、--cors-allow-originに*を指定している
@@ -96,9 +96,7 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 					});
 					// passiveモードでコンテンツを起動するための処理
 					const urlField = await client.$("id:url");
-					// テストアプリから外部と接続できているかのテスト
-					await urlField.setValue(`https://resource.dev.aws.coe.nicovideo.jp/coe/contents/v3-sample-game/0.0.1/content.json`);
-					//await urlField.setValue(`${serveProcess.url}/contents/0/content.raw.json`);
+					await urlField.setValue(`${serveProcess.url}/contents/0/content.raw.json`);
 					const button = await client.$("id:connect");
 					await button.click();
 
