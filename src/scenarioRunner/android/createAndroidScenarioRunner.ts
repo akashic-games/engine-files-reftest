@@ -71,7 +71,7 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 					app: param.apkPath,
 					isHeadless: true,
 					automationName: "UiAutomator2",
-					// appPackageとappActivityは、GameView Testのマニフェストファイル(AndroidManifest.xml)に書かれている値を記載
+					// appPackageとappActivityは、テスト用アプリのマニフェストファイル(AndroidManifest.xml)に書かれている値を記載
 					appPackage: param.appPackage,
 					appActivity: param.appActivity
 				}
