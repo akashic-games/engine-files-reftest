@@ -82,8 +82,8 @@
     "@akashic:registry": "https://registry.npmjs.org/",
     "access": "public"
   },
-  "repository" : {
+  "repository": {
     "type": "git",
-    "url": "akashic/engine-files-reftest.git"
+    "url": "akashic-games/engine-files-reftest.git"
   }
 }
