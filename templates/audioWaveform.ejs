@@ -6,22 +6,22 @@ ref: src/audioExtractor/
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<meta charset="UTF-8">
-	<title>ゲーム音声の波形画像</title>
-	<script src="<%= waveSurferPath %>"></script>
+  <meta charset="UTF-8">
+  <title>ゲーム音声の波形画像</title>
+  <script src="<%= waveSurferPath %>"></script>
 </head>
 <body>
-	<div id="<%= containerId %>"></div>
-	<script>
-		window.drawnAudioImage = false;
-		const wavesurfer = WaveSurfer.create({
-			container: '#<%= containerId %>',
-			waveColor: '#137a7f',
-		});
-		wavesurfer.load('<%= playVideoPath %>');
-		wavesurfer.on("ready", () => {
-			window.drawnAudioImage = true;
-		});
-	</script>
+  <div id="<%= containerId %>"></div>
+  <script>
+    window.drawnAudioImage = false;
+    const wavesurfer = WaveSurfer.create({
+      container: '#<%= containerId %>',
+      waveColor: '#137a7f',
+    });
+    wavesurfer.load('<%= playVideoPath %>');
+    wavesurfer.on("ready", () => {
+      window.drawnAudioImage = true;
+    });
+  </script>
 </body>
 </html>
