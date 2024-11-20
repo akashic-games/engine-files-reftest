@@ -60,5 +60,7 @@ export async function createAndroidEmulator(param: AndroidEmulatorParameterObjec
 		resolve();
 	};
 	await withTimeLimit(TIMEOUT, "android emulator can't start", () => untilResolve(() => new Promise(checkStarting), 500));
+	// androidアプリ内でのログを全て出力する
+	exec("adb logcat");
 	return new AndroidEmulatorProcess(process);
 }
