@@ -99,6 +99,7 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 					await urlField.setValue(`${serveProcess.url}/contents/0/content.raw.json`);
 					const button = await client.$("id:connect");
 					await button.click();
+					await button.click();
 
 					// コンテンツにエラーが発生した場合、コンテンツは止まってしまってcontentWaiterも解除できないので、制限時間を設けておく
 					await withTimeLimit(CONTENT_LIMIT_TIME, "content did not end in time", () => {
