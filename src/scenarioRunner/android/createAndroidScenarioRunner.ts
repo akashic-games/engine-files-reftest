@@ -5,7 +5,7 @@ import type { TargetBinarySource } from "../../targetBinary/TargetBinarySource";
 import type { ExecutionMode } from "../../types/ExecutionMode";
 import type { Screenshot } from "../../types/Screenshot";
 import { createWaiter } from "../../util/createWaiter";
-import { withTimeLimit } from "../../util/timerUtil";
+import { timeout, withTimeLimit } from "../../util/timerUtil";
 import { createAppiumServer } from "../AppiumServer";
 import { createContentOutputReceiver } from "../createContentOutputReceiver";
 import { evaluateScenarioByAppium } from "../evaluateScenario";
@@ -99,6 +99,7 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 					await urlField.setValue(`${serveProcess.url}/contents/0/content.raw.json`);
 					const button = await client.$("id:connect");
 					await button.click();
+					await timeout(3000); // test: 一旦3秒待ってみる
 					await button.click();
 
 					// コンテンツにエラーが発生した場合、コンテンツは止まってしまってcontentWaiterも解除できないので、制限時間を設けておく
