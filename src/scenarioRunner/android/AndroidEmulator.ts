@@ -7,9 +7,11 @@ const TIMEOUT = 30000;
 
 export class AndroidEmulatorProcess {
 	protected _process: ChildProcess;
+	private _versionInfo: string;
 
 	constructor(process: ChildProcess) {
 		this._process = process;
+		this._versionInfo = execSync("emulator -version").toString().split("\n")[0];
 	}
 
 	stop(): void {
@@ -17,8 +19,7 @@ export class AndroidEmulatorProcess {
 	}
 
 	getVersionInfo(): string {
-		const infoStrs = execSync("emulator -version").toString().split("\n");
-		return infoStrs[0];
+		return this._versionInfo;
 	}
 }
 
