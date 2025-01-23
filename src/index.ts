@@ -55,7 +55,7 @@ commander
 		"Path to save npm. If not specified default path is './.npmcache' or if configurePath is specified 'CONFIGURE_PATH/../.npmcache'"
 	);
 
-(async () => {
+void (async () => {
 	try {
 		commander.parse(process.argv);
 		const configure = createReftestConfigure(commander.opts<ReftestCommandOption>());
