@@ -10,13 +10,13 @@ describe("evaluateScenario", () => {
 		const ret = evaluateScenario(playlogJsonPath,
 			{
 				pointDown: async (_x: number, _y: number) => {
-					void Promise.resolve();
+					return;
 				},
 				pointMove: async (_x: number, _y: number) => {
-					void Promise.resolve();
+					return;
 				},
 				pointUp: async (_x: number, _y: number) => {
-					void Promise.resolve();
+					return;
 				},
 				takeScreenshot: async (fileName: string) => {
 					await wait(100);
