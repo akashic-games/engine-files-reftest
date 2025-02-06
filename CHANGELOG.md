@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.3.22
+
+* --serve-ver, --sandbox-ver オプションの追加
+
 ## 3.3.21
 
 * reftest 終了時にプロセスを明示的に終わらせるように
