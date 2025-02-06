@@ -213,6 +213,8 @@ describe("withRunnerUnit", () => {
 			targets: [],
 			update: false,
 			updateDiff: false,
+			sandboxVer: null,
+			serveVer: null,
 			sandboxPath: null,
 			servePath: null,
 			exportHtmlPath: null,
