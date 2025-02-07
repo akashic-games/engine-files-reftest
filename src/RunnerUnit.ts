@@ -101,11 +101,17 @@ async function getRunnerUnit(param: GetRunnerUnitParameterObject): Promise<Runne
 	const serveBinSrc: TargetBinarySource = param.configure.servePath ?
 		{ type: "local", path: path.resolve(param.configure.servePath) } :
 		{ type: "published", downloadDirPath: downloadDirPath };
+	if (param.configure.serveVer && serveBinSrc.type === "published") {
+		serveBinSrc.version = param.configure.serveVer;
+	}
 	switch (param.testType) {
 		case "sandbox":
 			const sandboxBinSrc: TargetBinarySource = param.configure.sandboxPath ?
 				{ type: "local", path: path.resolve(param.configure.sandboxPath) } :
 				{ type: "published", downloadDirPath: downloadDirPath };
+			if (param.configure.sandboxVer && sandboxBinSrc.type === "published") {
+				sandboxBinSrc.version = param.configure.sandboxVer;
+			}
 			scenarioRunner = await createStaticHostScenarioRunner(await createAkashicSandbox(sandboxBinSrc));
 			break;
 		case "serve":

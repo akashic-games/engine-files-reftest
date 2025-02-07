@@ -47,6 +47,8 @@ engine-files-reftest -c <path> [--options]
 |--diff-dir-path <path>| |正解画像と出力画像の間の差分画像を出力するディレクトリのパスを指定。| |
 |--error-diff-dir-path <path>| |正解画像と出力画像の間に大きな差分が発生した時の差分画像を出力するディレクトリのパスを指定。| |
 |--threshold <theshold>| |正解画像と出力画像の間でどの程度まで差分を許すか0~1の割合で定義。|0(0%)|
+|--sandbox-ver <version>| |akashic-sandboxのバージョンを指定。指定しなかった場合は最新のakashic-sandboxをインストールして利用する。--sandbox-path 指定時は無効となる。| |
+|--serve-ver <version>| |akashic-cli-serveのバージョンを指定。指定しなかった場合は最新のakashic-cli-serveをインストールして利用する。--serve-path 指定時は無効となる。| |
 |--sandbox-path <path>| |akashic-sandboxのパスを指定。このオプションを指定した場合はそのパスを利用する。指定しなかった場合は最新のakashic-sandboxをインストールして利用する。| |
 |--serve-path <path>| |akashic-cli-serveのパスを指定。このオプションを指定した場合はそのパスを利用する。指定しなかった場合は最新のakashic-cli-serveをインストールして利用する。| |
 |--export-html-path <path>| |akashic-cli-export-htmlのパスを指定。このオプションを指定した場合はそのパスを利用する。指定しなかった場合は最新のakashic-cli-exportをインストールして利用する。| |
@@ -72,6 +74,8 @@ engine-files-reftest -c <path> [--options]
     "./**/configure.json"
   ],
   "update": false, // --update
+  "sandboxVer": "x.x.x" // --sandbox-ver
+  "serveVer": "x.x.x" // --serve-ver
   "sandboxPath": "/path/to/sandbox", // --sandbox-path
   "servePath": "/path/to/serve", // --serve-path
   "exportHtmlPath": "/path/to/export-html", // --export-html-path
@@ -166,6 +170,6 @@ engine-files-reftest -c <path> [--options]
 ## ライセンス
 本リポジトリは MIT License の元で公開されています。
 詳しくは [LICENSE](https://github.com/akashic-games/engine-files-reftest/blob/main/LICENSE) をご覧ください。
- 
+
 ただし、画像ファイルおよび音声ファイルは
 [CC BY 2.1 JP](https://creativecommons.org/licenses/by/2.1/jp/) の元で公開されています。

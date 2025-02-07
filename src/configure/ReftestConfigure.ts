@@ -16,6 +16,8 @@ export interface ReftestCommandOption {
 	target?: string[];
 	update?: boolean;
 	updateDiff?: boolean;
+	sandboxVer?: string;
+	serveVer?: string;
 	sandboxPath?: string;
 	servePath?: string;
 	exportHtmlPath?: string;
@@ -47,6 +49,8 @@ export interface ReftestConfigure {
 	targets: string[];
 	update: boolean | false;
 	updateDiff: boolean | false;
+	sandboxVer: string | null;
+	serveVer: string | null;
 	sandboxPath: string | null;
 	servePath: string | null;
 	exportHtmlPath: string | null;
@@ -85,6 +89,8 @@ export function createReftestConfigure(option: ReftestCommandOption): ReftestCon
 			targets: [],
 			update: false,
 			updateDiff: false,
+			sandboxVer: null,
+			serveVer: null,
 			sandboxPath: null,
 			servePath: null,
 			exportHtmlPath: null,
@@ -105,6 +111,8 @@ export function createReftestConfigure(option: ReftestCommandOption): ReftestCon
 	configure.targets = (configure.targets ?? []).map(p => path.resolve(dirPath, p)).concat(option.target ?? []);
 	configure.update = option.update ?? (configure.update ?? false);
 	configure.updateDiff = option.updateDiff ?? (configure.updateDiff ?? false);
+	configure.sandboxVer = option.sandboxVer ?? (configure.sandboxVer ?? null);
+	configure.serveVer = option.serveVer ?? (configure.serveVer ?? null);
 	configure.sandboxPath = option.sandboxPath ?? resolvePath(dirPath, configure.sandboxPath);
 	configure.servePath = option.servePath ?? resolvePath(dirPath, configure.servePath);
 	configure.exportHtmlPath = option.exportHtmlPath ?? resolvePath(dirPath, configure.exportHtmlPath);

@@ -39,6 +39,8 @@ commander
 	.option("--diff-dir-path <path>", "Path of directory saved error diff image.")
 	.option("--error-diff-dir-path <path>", "Path of directory saved error diff image.")
 	.option("--threshold <theshold>", `Threshold of diff image. value range: 0 ~ 1. default: ${DEFAULT_IMAGE_DIFF_THRESHOLD}`)
+	.option("--sandbox-ver <version>", "Version of akashic-sandbox")
+	.option("--serve-ver <version>", "Version of akashic-cli-serve")
 	.option("--sandbox-path <path>", "Path of akashic-sandbox")
 	.option("--serve-path <path>", "Path of akashic-cli-serve")
 	.option("--export-html-path <path>", "Path of akashic-cli-export-html")
