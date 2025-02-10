@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.3.23
+
+* akashic-cli 統合後のバージョンの sandbox が扱えない問題を修正
+
 ## 3.3.22
 
 * --serve-ver, --sandbox-ver オプションの追加
