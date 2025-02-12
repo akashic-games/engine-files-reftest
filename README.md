@@ -7,7 +7,7 @@
 Akashic関連ツールの動作確認を行うツールです。
 
 与えられたシナリオでコンテンツを実行し、スクリーンショットなどの形で結果を取得、事前に作成した正解データとの一致をテストします。
-現在のところ akashic-cli-serve, akashic-sandbox, akashic-cli-export-html, akashic-cli-export-zip をサポートしています。
+現在のところ akashic-cli-serve, akashic-(cli-)sandbox, akashic-cli-export-html, akashic-cli-export-zip をサポートしています。
 
 ## 用語
 
@@ -47,9 +47,9 @@ engine-files-reftest -c <path> [--options]
 |--diff-dir-path <path>| |正解画像と出力画像の間の差分画像を出力するディレクトリのパスを指定。| |
 |--error-diff-dir-path <path>| |正解画像と出力画像の間に大きな差分が発生した時の差分画像を出力するディレクトリのパスを指定。| |
 |--threshold <theshold>| |正解画像と出力画像の間でどの程度まで差分を許すか0~1の割合で定義。|0(0%)|
-|--sandbox-ver <version>| |akashic-sandboxのバージョンを指定。指定しなかった場合は最新のakashic-sandboxをインストールして利用する。--sandbox-path 指定時は無効となる。| |
+|--sandbox-ver <version>| |akashic-(cli-)sandboxのバージョンを指定。指定しなかった場合は最新のakashic-(cli-)sandboxをインストールして利用する。--sandbox-path 指定時は無効となる。| |
 |--serve-ver <version>| |akashic-cli-serveのバージョンを指定。指定しなかった場合は最新のakashic-cli-serveをインストールして利用する。--serve-path 指定時は無効となる。| |
-|--sandbox-path <path>| |akashic-sandboxのパスを指定。このオプションを指定した場合はそのパスを利用する。指定しなかった場合は最新のakashic-sandboxをインストールして利用する。| |
+|--sandbox-path <path>| |akashic-(cli-)sandboxのパスを指定。このオプションを指定した場合はそのパスを利用する。指定しなかった場合は最新のakashic-(cli-)sandboxをインストールして利用する。| |
 |--serve-path <path>| |akashic-cli-serveのパスを指定。このオプションを指定した場合はそのパスを利用する。指定しなかった場合は最新のakashic-cli-serveをインストールして利用する。| |
 |--export-html-path <path>| |akashic-cli-export-htmlのパスを指定。このオプションを指定した場合はそのパスを利用する。指定しなかった場合は最新のakashic-cli-exportをインストールして利用する。| |
 |--export-zip-path <path>| |akashic-cli-export-zipのパスを指定。このオプションを指定した場合はそのパスを利用する。指定しなかった場合は最新のakashic-cli-exportをインストールして利用する。| |
@@ -111,14 +111,14 @@ engine-files-reftest -c <path> [--options]
 
 ### シナリオ作成方法
 
-* akashic-cli-serveまたはakashic-sandboxで出力されるplaylogファイルを利用することができます。
+* akashic-cli-serveまたはakashic-(cli-)sandboxで出力されるplaylogファイルを利用することができます。
 * ただし、reftestでスクリーンショットを取得する,コンテンツを終了するといった動作は、[`ReftestMessageEvent`](./src/types/scenario.ts)で定義されている型でplaylogファイルに直接追記する必要があります。
 
 ### `--test-type`の種類
 
 |type名|シナリオランナー|プリプロセッサー|
 |:---:|:---:|:---:|
-|sandbox|akashic-sandbox|なし|
+|sandbox|akashic-(cli-)sandbox|なし|
 |serve|akashic-cli-serve|なし|
 |export-zip|akashic-cli-serve|akashic-cli-zip|
 |export-html|http-server|akashic-cli-html|
