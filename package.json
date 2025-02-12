@@ -77,6 +77,9 @@
     "wavesurfer.js": "^6.4.0",
     "webdriverio": "^6.12.1"
   },
+  "overrides": {
+    "@xmldom/xmldom": "0.8.10"
+  },
   "publishConfig": {
     "@akashic:registry": "https://registry.npmjs.org/",
     "access": "public"
