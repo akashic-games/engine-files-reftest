@@ -18,7 +18,7 @@ export async function renderAudioWaveform(host: string, playVideoPath: string): 
 	const audioWaveformPage = await createAudioWaveformPageHost(host, playVideoPath);
 	const browser = await puppeteer.launch({
 		headless: true,
-		executablePath: process.env.CHROME_BIN || null,
+		executablePath: process.env.CHROME_BIN || undefined,
 		args: ["--no-sandbox", "--headless", "--disable-gpu", "--disable-dev-shm-usage"]
 	});
 	try {

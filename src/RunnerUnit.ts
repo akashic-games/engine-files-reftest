@@ -95,9 +95,11 @@ export async function withRunnerUnit<T>(param: GetRunnerUnitParameterObject, fun
 
 async function getRunnerUnit(param: GetRunnerUnitParameterObject): Promise<RunnerUnit> {
 	let scenarioRunner: ScenarioRunner;
-	let preprocessor: Preprocessor;
-	let audioExtractor: AudioExtractor;
-	const downloadDirPath = path.resolve(param.configure.npmCacheDir);
+	let preprocessor: Preprocessor | null = null;
+	let audioExtractor: AudioExtractor | null = null;
+
+	// npmCacheDir にはデフォルトパスがあるので、nullにはならない想定
+	const downloadDirPath = path.resolve(param.configure.npmCacheDir!);
 	const serveBinSrc: TargetBinarySource = param.configure.servePath ?
 		{ type: "local", path: path.resolve(param.configure.servePath) } :
 		{ type: "published", downloadDirPath: downloadDirPath };

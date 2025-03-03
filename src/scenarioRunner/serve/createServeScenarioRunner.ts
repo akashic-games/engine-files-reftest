@@ -34,7 +34,7 @@ export async function createServeScenarioRunner(binSrc: TargetBinarySource): Pro
 			const serveProcess = await serveBin.start({ contentDirPath, hostname: "localhost", options: serveOptions });
 			const browser = await puppeteer.launch({
 				headless: true,
-				executablePath: process.env.CHROME_BIN || null,
+				executablePath: process.env.CHROME_BIN || undefined,
 				args: ["--no-sandbox", "--headless", "--disable-gpu", "--disable-dev-shm-usage"]
 			});
 			const page = await browser.newPage();

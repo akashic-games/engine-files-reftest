@@ -16,7 +16,7 @@ describe("resolveRootDirPath", () => {
 		try {
 			resolveRootDirPath([]);
 			done.fail();
-		} catch (e) {
+		} catch (e: any) {
 			expect(e.message).toBe("Can't resolve root directory path. Please specify file paths.");
 			done();
 		}

@@ -23,7 +23,7 @@ export class AndroidEmulatorProcess {
 }
 
 interface AndroidEmulatorParameterObject {
-	emulatorName?: string;
+	emulatorName: string | null;
 }
 
 export async function createAndroidEmulator(param: AndroidEmulatorParameterObject): Promise<AndroidEmulatorProcess> {

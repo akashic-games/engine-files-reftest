@@ -5,8 +5,12 @@ export interface Waiter<T> {
 }
 
 export function createWaiter<T = void>(): Waiter<T> {
-	let resolve: (v: T) => void = null;
-	let reject: (e: Error) => void = null;
+	let resolve: (v: T) => void = (_v: T) => {
+		//
+	};
+	let reject: (e: Error) => void = (_e: Error) => {
+		//
+	};
 	const promise = new Promise<T>((res: (val: T) => void, rej: (e: Error) => void) => {
 		resolve = res;
 		reject = rej;

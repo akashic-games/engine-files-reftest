@@ -20,9 +20,9 @@ interface CreateAndroidScenarioRunnerParameterObject {
 	serveBinSrc: TargetBinarySource;
 	apkPath: string;
 	playlogClientPath: string;
-	emulatorName?: string;
-	appPackage: string;
-	appActivity: string;
+	emulatorName: string | null;
+	appPackage: string | null;
+	appActivity: string | null;
 }
 
 export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRunnerParameterObject): Promise<ScenarioRunner> {
@@ -72,8 +72,8 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 					isHeadless: true,
 					automationName: "UiAutomator2",
 					// appPackageとappActivityは、テスト用アプリのマニフェストファイル(AndroidManifest.xml)に書かれている値を記載
-					appPackage: param.appPackage,
-					appActivity: param.appActivity
+					appPackage: param.appPackage ?? undefined,
+					appActivity: param.appActivity ?? undefined
 				}
 			});
 			try {

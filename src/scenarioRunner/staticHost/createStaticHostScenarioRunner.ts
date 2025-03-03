@@ -25,7 +25,7 @@ export async function createStaticHostScenarioRunner(hostBin: StaticHost): Promi
 			const serveProcess = await hostBin.start({ contentDirPath, hostname: "localhost" });
 			const browser = await puppeteer.launch({
 				headless: true,
-				executablePath: process.env.CHROME_BIN || null,
+				executablePath: process.env.CHROME_BIN || undefined,
 				args: ["--no-sandbox", "--headless", "--disable-gpu", "--disable-dev-shm-usage"]
 			});
 			let page: puppeteer.Page;
@@ -53,14 +53,15 @@ export async function createStaticHostScenarioRunner(hostBin: StaticHost): Promi
 				if (e instanceof TimeoutError) {
 					const timeoutImage: Screenshot = {
 						fileName: `timeout_try${playCount}_${extractDirname(scenarioPath)}.png`,
-						base64: await page.screenshot({ encoding: "base64" })
+						base64: await page!.screenshot({ encoding: "base64" }) // page 代入前にエラーにならない想定なので ! を使用
 					};
 					return { status: "timeout", timeoutImage };
 				} else {
 					throw e;
 				}
 			} finally {
-				if (!page.isClosed()) await page.close();
+				// page 代入前にエラーにならない想定なので ! を使用
+				if (!page!.isClosed()) await page!.close();
 				await browser.close();
 				serveProcess.stop();
 			}

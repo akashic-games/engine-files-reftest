@@ -81,7 +81,7 @@ void (async () => {
 		const errorDiffDirBasePath: string | null = configure.errorDiffDirPath ? path.resolve(configure.errorDiffDirPath) : null;
 		const timeoutErrorDirPath: string | null =  configure.timeoutErrorDirPath ? path.resolve(configure.timeoutErrorDirPath) : null;
 		const imageDiffThreshold = configure.threshold ?? DEFAULT_IMAGE_DIFF_THRESHOLD;
-		const reftestResultMap: { [testType in TestType]?: { [contentName: string]: ReftestResult }; } = {};
+		const reftestResultMap: { [testType in TestType]: { [contentName: string]: ReftestResult }; } = Object.create({});
 		let htmlReportDir: string | null = null;
 		if (configure.outputHtml) {
 			htmlReportDir = path.resolve(configure.outputHtml);
@@ -93,7 +93,7 @@ void (async () => {
 		}
 
 		for (const testType of targetTestTypes) {
-			reftestResultMap[testType] = {};
+			reftestResultMap[testType] = Object.create({});
 			await withRunnerUnit<void>({testType, configure}, async (runnerUnit) => {
 				for (const reftestEntry of reftestEntries) {
 					const configureHash = createConfigureHash(reftestEntry);
@@ -195,7 +195,7 @@ void (async () => {
 
 		const thresholdErrors: string[] = [];
 		const timeoutErrors: string[] = [];
-		Object.keys(reftestResultMap).flatMap((type: TestType) => {
+		targetTestTypes.flatMap((type: TestType) => {
 			Object.keys(reftestResultMap[type]).map(name => {
 				const status = reftestResultMap[type][name].status;
 				const contentName = [`${name}(${type})`].join(",");

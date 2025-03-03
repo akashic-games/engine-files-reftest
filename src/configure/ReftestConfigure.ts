@@ -68,7 +68,7 @@ export interface ReftestConfigure {
 // 設定ファイルとコマンド指定されたオプションからReftestConfigureを生成する
 // ここでは設定ファイルとオプションの突き合わせを行うだけで値の整形は行わない。ただし設定ファイルから指定されたパスについては設定ファイルのパスが分からないとパス解決ができないためここでパス解決する
 export function createReftestConfigure(option: ReftestCommandOption): ReftestConfigure {
-	let configurePath: string;
+	let configurePath: string | null = null;
 	// 設定ファイル読み込み
 	if (option.configure) {
 		if (!fs.existsSync(path.resolve(option.configure))) {
@@ -150,6 +150,6 @@ export function resolveTestTypes(type: CommandOptionTestType | null | undefined)
 	);
 }
 
-function resolvePath(dirPath: string, targetPath?: string): string | null {
-	return targetPath ? path.resolve(dirPath, targetPath) : null;
+function resolvePath(dirPath: string, targetPath: string | null = null): string | null {
+	return targetPath != null ? path.resolve(dirPath, targetPath) : null;
 }

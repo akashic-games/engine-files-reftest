@@ -98,7 +98,7 @@ describe("ReftestConfigure", () => {
 			try {
 				createReftestConfigure({ configure: notExistConfigPath });
 				done.fail();
-			} catch (err) {
+			} catch (err: any) {
 				expect(err.message).toBe(`not exist ${notExistConfigPath}`);
 				done();
 			}

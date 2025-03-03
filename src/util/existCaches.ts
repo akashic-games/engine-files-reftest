@@ -14,48 +14,49 @@ export function existCaches(
 	//  - バージョン指定 (--sandbox-ver など) を無視している
 
 	let binSrc: string;
+	const npmCacheDir = configure.npmCacheDir!; // npmCacheDir にはデフォルトパスがあるので、nullにはならない想定
 	for (const testType of targetTestTypes) {
 		switch (testType) {
 			// 指定するテストタイプに必要なバイナリキャッシュが存在するか
 			case "sandbox":
-				binSrc = path.resolve(configure.npmCacheDir, "node_modules", ".bin", "akashic-cli-sandbox");
+				binSrc = path.resolve(npmCacheDir, "node_modules", ".bin", "akashic-cli-sandbox");
 				if (!fs.existsSync(binSrc)) {
 					// 旧バージョン向けフォールバック。本当はバージョンによってキャッシュは一意に定まるはずだが、
 					// 現在の実装はバージョンを考慮できていないので、ここでは単に「あれば使う」。(この関数上部のコメントも参照)
-					binSrc = path.resolve(configure.npmCacheDir, "node_modules", ".bin", "akashic-sandbox");
+					binSrc = path.resolve(npmCacheDir, "node_modules", ".bin", "akashic-sandbox");
 					if (!fs.existsSync(binSrc)) {
 						return false;
 					}
 				}
 				break;
 			case "serve":
-				binSrc = path.resolve(configure.npmCacheDir, "node_modules", ".bin", "akashic-cli-serve");
+				binSrc = path.resolve(npmCacheDir, "node_modules", ".bin", "akashic-cli-serve");
 				if (!fs.existsSync(binSrc)) {
 					return false;
 				}
 				break;
 			case "export-zip":
-				binSrc = path.resolve(configure.npmCacheDir, "node_modules", ".bin", "akashic-cli-export-zip");
+				binSrc = path.resolve(npmCacheDir, "node_modules", ".bin", "akashic-cli-export-zip");
 				if (!fs.existsSync(binSrc)) {
 					return false;
 				}
-				binSrc = path.resolve(configure.npmCacheDir, "node_modules", ".bin", "akashic-cli-serve");
+				binSrc = path.resolve(npmCacheDir, "node_modules", ".bin", "akashic-cli-serve");
 				if (!fs.existsSync(binSrc)) {
 					return false;
 				}
 				break;
 			case "export-html":
-				binSrc = path.resolve(configure.npmCacheDir, "node_modules", ".bin", "akashic-cli-export-html");
+				binSrc = path.resolve(npmCacheDir, "node_modules", ".bin", "akashic-cli-export-html");
 				if (!fs.existsSync(binSrc)) {
 					return false;
 				}
-				binSrc = path.resolve(configure.npmCacheDir, "node_modules", ".bin", "akashic-cli-serve");
+				binSrc = path.resolve(npmCacheDir, "node_modules", ".bin", "akashic-cli-serve");
 				if (!fs.existsSync(binSrc)) {
 					return false;
 				}
 				break;
 			case "android":
-				binSrc = path.resolve(configure.npmCacheDir, "node_modules", ".bin", "akashic-cli-serve");
+				binSrc = path.resolve(npmCacheDir, "node_modules", ".bin", "akashic-cli-serve");
 				if (!fs.existsSync(binSrc)) {
 					return false;
 				}
@@ -69,32 +70,32 @@ export function existCaches(
 	for (const testType of targetTestTypes) {
 		switch (testType) {
 			case "sandbox":
-				binSrc = path.resolve(configure.npmCacheDir, "node_modules", ".bin", "akashic-cli-sandbox");
+				binSrc = path.resolve(npmCacheDir, "node_modules", ".bin", "akashic-cli-sandbox");
 				if (!fs.existsSync(binSrc)) {
 					// 旧バージョン向けフォールバック。本当はバージョンによってキャッシュは一意に定まるはずだが、
 					// 現在の実装はバージョンを考慮できていないので、ここでは単に「あれば使う」。(この関数上部のコメントも参照)
-					binSrc = path.resolve(configure.npmCacheDir, "node_modules", ".bin", "akashic-sandbox");
+					binSrc = path.resolve(npmCacheDir, "node_modules", ".bin", "akashic-sandbox");
 				}
 				configure.sandboxPath = binSrc;
 				break;
 			case "serve":
-				binSrc = path.resolve(configure.npmCacheDir, "node_modules", ".bin", "akashic-cli-serve");
+				binSrc = path.resolve(npmCacheDir, "node_modules", ".bin", "akashic-cli-serve");
 				configure.servePath = binSrc;
 				break;
 			case "export-zip":
-				binSrc = path.resolve(configure.npmCacheDir, "node_modules", ".bin", "akashic-cli-export-zip");
+				binSrc = path.resolve(npmCacheDir, "node_modules", ".bin", "akashic-cli-export-zip");
 				configure.exportZipPath = binSrc;
-				binSrc = path.resolve(configure.npmCacheDir, "node_modules", ".bin", "akashic-cli-serve");
+				binSrc = path.resolve(npmCacheDir, "node_modules", ".bin", "akashic-cli-serve");
 				configure.servePath = binSrc;
 				break;
 			case "export-html":
-				binSrc = path.resolve(configure.npmCacheDir, "node_modules", ".bin", "akashic-cli-export-html");
+				binSrc = path.resolve(npmCacheDir, "node_modules", ".bin", "akashic-cli-export-html");
 				configure.exportHtmlPath = binSrc;
-				binSrc = path.resolve(configure.npmCacheDir, "node_modules", ".bin", "akashic-cli-serve");
+				binSrc = path.resolve(npmCacheDir, "node_modules", ".bin", "akashic-cli-serve");
 				configure.servePath = binSrc;
 				break;
 			case "android":
-				binSrc = path.resolve(configure.npmCacheDir, "node_modules", ".bin", "akashic-cli-serve");
+				binSrc = path.resolve(npmCacheDir, "node_modules", ".bin", "akashic-cli-serve");
 				configure.servePath = binSrc;
 				break;
 			default:

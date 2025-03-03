@@ -11,8 +11,9 @@ export async function evaluateScenarioByPuppeteer(
 	selector: string = "canvas"
 ): Promise<void> {
 	await page.waitForSelector(selector);
-	const canvasHandle = await page.$(selector);
-	const contentRect = await canvasHandle.boundingBox();
+	// canvas 要素が存在する環境で実行する前提なので、! を付与する
+	const canvasHandle = (await page.$(selector))!;
+	const contentRect = (await canvasHandle.boundingBox())!;
 	await evaluateScenario(
 		playlogJsonPath,
 		{
@@ -97,17 +98,17 @@ export async function evaluateScenario(
 	const fps: number = playlogJson.startPoints[0].data.fps;
 	const promises: (Promise<void> | null)[] = [];
 	await new Promise<void>(resolve => {
-		const ticksWithEvents: pl.Tick[] = tickList[pl.TickListIndex.Ticks];
+		// TickListIndex.Ticks(= 2) を指定しているので、必ず配列が返ってくる想定
+		const ticksWithEvents: pl.Tick[] = tickList[pl.TickListIndex.Ticks]!;
 		let pseudoGameAge = 0;
-		let timer = setInterval(() => {
+		const timer = setInterval(() => {
 			if (ticksWithEvents.length === 0) {
 				clearInterval(timer);
-				timer = null;
 				resolve();
 				return;
 			}
 			if (pseudoGameAge === ticksWithEvents[0][pl.TickIndex.Frame]) {
-				const tick = ticksWithEvents.shift();
+				const tick = ticksWithEvents.shift()!;
 				(tick[pl.TickIndex.Events] ?? []).forEach(ev => {
 					switch (ev[pl.EventIndex.Code]) {
 						case pl.EventCode.Message:

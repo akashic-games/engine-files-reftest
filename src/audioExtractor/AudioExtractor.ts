@@ -21,5 +21,5 @@ export interface AudioExtractor {
 }
 
 // この辺りのパラメータは決め打ちになってしまっているので、何かしらの手段で設定できるようにすべき
-export const AUDIO_IMAGE_FILE_NAME = "audio.png";
-export const THRESHOLD_FOR_AUDIO_IMAGE = process.env.AUDIO_REFTEST_THRESHOLD || 0.07;
+export const AUDIO_IMAGE_FILE_NAME: string = "audio.png";
+export const THRESHOLD_FOR_AUDIO_IMAGE: number = Number(process.env.AUDIO_REFTEST_THRESHOLD) || 0.07;

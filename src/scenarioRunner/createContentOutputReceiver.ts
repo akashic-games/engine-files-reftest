@@ -45,7 +45,8 @@ export async function createContentOutputReceiver(host: string): Promise<Content
 			}
 			res.status(200).json({meta: {status: 200}});
 		} catch (e) {
-			onError.fire(e);
+			const error = e instanceof Error ? e : new Error(`Console Api Error, Request Parameter: ${JSON.stringify(req.body)}`);
+			onError.fire(error);
 			next(e);
 		}
 	});
