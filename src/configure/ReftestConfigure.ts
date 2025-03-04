@@ -44,6 +44,7 @@ export interface AndroidConfigure {
 	appActivity: string | null;
 }
 
+// TODO: NormalizedReftestConfigure も作成する。その場合、全パラメータにnull以外のデフォルト値を用意する必要がある。
 export interface ReftestConfigure {
 	testType: CommandOptionTestType | null;
 	targets: string[];
