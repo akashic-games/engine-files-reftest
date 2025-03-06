@@ -1,11 +1,11 @@
 import * as fs from "fs";
 import * as path from "path";
-import type { ReftestConfigure } from "../configure/ReftestConfigure";
+import type { NormalizedReftestConfigure } from "../configure/ReftestConfigure";
 
 // 指定したテストタイプのキャッシュが存在するか判定する関数
 // 存在する場合には、 configure の値をそのパスへ破壊的に変更する
 export function existCaches(
-	configure: ReftestConfigure, targetTestTypes: Readonly<"sandbox" | "serve" | "export-zip" | "export-html" | "android">[]
+	configure: NormalizedReftestConfigure, targetTestTypes: Readonly<"sandbox" | "serve" | "export-zip" | "export-html" | "android">[]
 ): boolean {
 	// TODO: キャッシュ周りを抜本的に見直す。少なくとも以下の点を改める:
 	//  - 名前に反して破壊的に値を書き換えている
@@ -14,7 +14,7 @@ export function existCaches(
 	//  - バージョン指定 (--sandbox-ver など) を無視している
 
 	let binSrc: string;
-	const npmCacheDir = configure.npmCacheDir!; // npmCacheDir にはデフォルトパスがあるので、nullにはならない想定
+	const npmCacheDir = configure.npmCacheDir; // npmCacheDir にはデフォルトパスがあるので、nullにはならない想定
 	for (const testType of targetTestTypes) {
 		switch (testType) {
 			// 指定するテストタイプに必要なバイナリキャッシュが存在するか

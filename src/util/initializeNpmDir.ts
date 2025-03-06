@@ -1,9 +1,9 @@
 import { execSync } from "child_process";
 import * as fs from "fs";
-import type { ReftestConfigure } from "../configure/ReftestConfigure";
+import type { NormalizedReftestConfigure } from "../configure/ReftestConfigure";
 // キャッシュディレクトリを初期化する関数
-export function initializeNpmDir(configure: ReftestConfigure): void {
-	const npmCacheDir = configure.npmCacheDir!; // npmCacheDir にはデフォルトパスがあるので、nullにはならない想定
+export function initializeNpmDir(configure: NormalizedReftestConfigure): void {
+	const npmCacheDir = configure.npmCacheDir; // npmCacheDir にはデフォルトパスがあるので、nullにはならない想定
 	if (fs.existsSync(npmCacheDir))fs.rmdirSync(npmCacheDir, { recursive: true });
 	console.log("Binary cache has been cleared");
 	fs.mkdirSync(npmCacheDir, { recursive: true });

@@ -28,7 +28,7 @@ export async function createStaticHostScenarioRunner(hostBin: StaticHost): Promi
 				executablePath: process.env.CHROME_BIN || undefined,
 				args: ["--no-sandbox", "--headless", "--disable-gpu", "--disable-dev-shm-usage"]
 			});
-			let page: puppeteer.Page;
+			let page: puppeteer.Page | null = null;
 			let playCount = 0;
 			try {
 				for (; playCount < playTimes; playCount++) {
@@ -40,7 +40,8 @@ export async function createStaticHostScenarioRunner(hostBin: StaticHost): Promi
 					await page.goto(serveProcess.url);
 					// 稀に終了メッセージを流す前にコンテンツが終了することがあるため、コンテンツが確実に終了している時間を経過したら強制的に待機を解除する処理を用意した
 					await withTimeLimit(CONTENT_LIMIT_TIME, "content did not end in time", () => {
-						return evaluateScenarioByPuppeteer(page, scenarioPath, (s: Screenshot) => {
+						// この時点で、page は代入済みのはず
+						return evaluateScenarioByPuppeteer(page!, scenarioPath, (s: Screenshot) => {
 							screenshots.push({
 								fileName: `try${playCount}_${s.fileName}`,
 								base64: s.base64
@@ -53,15 +54,14 @@ export async function createStaticHostScenarioRunner(hostBin: StaticHost): Promi
 				if (e instanceof TimeoutError) {
 					const timeoutImage: Screenshot = {
 						fileName: `timeout_try${playCount}_${extractDirname(scenarioPath)}.png`,
-						base64: await page!.screenshot({ encoding: "base64" }) // page 代入前にエラーにならない想定なので ! を使用
+						base64: await page!.screenshot({ encoding: "base64" }) // TimeoutError は withTimeLimit() から来るので、page は代入済みのはず
 					};
 					return { status: "timeout", timeoutImage };
 				} else {
 					throw e;
 				}
 			} finally {
-				// page 代入前にエラーにならない想定なので ! を使用
-				if (!page!.isClosed()) await page!.close();
+				if (!page?.isClosed()) await page?.close();
 				await browser.close();
 				serveProcess.stop();
 			}

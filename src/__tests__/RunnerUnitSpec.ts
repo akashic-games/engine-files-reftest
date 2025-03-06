@@ -1,7 +1,7 @@
 import * as path from "path";
 import type { AudioExtractor } from "../audioExtractor/AudioExtractor";
 import { createServeAudioExtractor } from "../audioExtractor/createServeAudioExtractor";
-import type { ReftestConfigure } from "../configure/ReftestConfigure";
+import { DEFAULT_IMAGE_DIFF_THRESHOLD, type NormalizedReftestConfigure } from "../configure/ReftestConfigure";
 import type { NormalizedReftestEntry } from "../configure/ReftestEntry";
 import type { Preprocessor } from "../preprocessor/Preprocessor";
 import { RunnerUnit, withRunnerUnit } from "../RunnerUnit";
@@ -203,7 +203,7 @@ describe("RunnerUnit", () => {
 });
 
 describe("withRunnerUnit", () => {
-	let reftestConfigure: ReftestConfigure;
+	let reftestConfigure: NormalizedReftestConfigure;
 	beforeEach(() => {
 		jest.resetAllMocks();
 		screnarioRunnerStr = null;
@@ -221,7 +221,7 @@ describe("withRunnerUnit", () => {
 			exportZipPath: null,
 			diffDirPath: null,
 			errorDiffDirPath: null,
-			threshold: null,
+			threshold: DEFAULT_IMAGE_DIFF_THRESHOLD,
 			android: null,
 			outputHtml: null,
 			timeoutErrorDirPath: null,

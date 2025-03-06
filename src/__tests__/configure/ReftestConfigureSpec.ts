@@ -19,12 +19,12 @@ describe("ReftestConfigure", () => {
 				exportZipPath: null,
 				diffDirPath: null,
 				errorDiffDirPath: null,
-				threshold: null,
+				threshold: 0,
 				android: null,
 				outputHtml: null,
 				timeoutErrorDirPath: null,
 				useNpmCache: false,
-				npmCacheDir: path.resolve(".", ".bincache")
+				npmCacheDir: path.resolve(".", "__bincache")
 			});
 		});
 		test("設定ファイルの指定がある場合は設定ファイルで指定した値が返ってくる", () => {
@@ -42,11 +42,11 @@ describe("ReftestConfigure", () => {
 				exportZipPath: null,
 				diffDirPath: null,
 				errorDiffDirPath: null,
-				threshold: null,
+				threshold: 0,
 				outputHtml: null,
 				timeoutErrorDirPath: null,
 				useNpmCache: false,
-				npmCacheDir: path.resolve(path.resolve(__dirname, "../fixture"), ".bincache")
+				npmCacheDir: path.resolve(path.resolve(__dirname, "../fixture"), "__bincache")
 			});
 		});
 		test("設定ファイルとその他オプションの指定がある場合はオプションで指定した値が優先される", () => {
@@ -83,7 +83,7 @@ describe("ReftestConfigure", () => {
 				outputHtml: null,
 				timeoutErrorDirPath: null,
 				useNpmCache: false,
-				npmCacheDir: path.resolve(path.resolve(__dirname, "../fixture"), ".bincache"),
+				npmCacheDir: path.resolve(path.resolve(__dirname, "../fixture"), "__bincache"),
 				android: {
 					apkPath: path.resolve("/tmp/test.apk"),
 					emulator: null,
