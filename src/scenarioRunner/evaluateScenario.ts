@@ -98,7 +98,6 @@ export async function evaluateScenario(
 	const fps: number = playlogJson.startPoints[0].data.fps;
 	const promises: (Promise<void> | null)[] = [];
 	await new Promise<void>(resolve => {
-		// TickListIndex.Ticks(= 2) を指定しているので、必ず配列が返ってくる想定
 		const ticksWithEvents: pl.Tick[] = tickList[pl.TickListIndex.Ticks] ?? [];
 		let pseudoGameAge = 0;
 		const timer = setInterval(() => {

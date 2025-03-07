@@ -166,7 +166,7 @@ export function createReftestConfigure(option: ReftestCommandOption): Normalized
 	const normalizedConfigure: NormalizedReftestConfigure = {
 		...configure,
 		threshold: configure.threshold ?? DEFAULT_IMAGE_DIFF_THRESHOLD,
-		npmCacheDir: configure.npmCacheDir ?? resolvePath(dirPath, "__bincache")!
+		npmCacheDir: configure.npmCacheDir ?? resolvePath(dirPath, "__bincache")
 	};
 	return normalizedConfigure;
 }
@@ -178,6 +178,8 @@ export function resolveTestTypes(type: CommandOptionTestType | null | undefined)
 	);
 }
 
+function resolvePath(driPath: string, targetPath: string): string;
+function resolvePath(driPath: string, targetPath?: string | null): string | null;
 function resolvePath(dirPath: string, targetPath: string | null = null): string | null {
 	return targetPath != null ? path.resolve(dirPath, targetPath) : null;
 }

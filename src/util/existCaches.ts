@@ -14,7 +14,7 @@ export function existCaches(
 	//  - バージョン指定 (--sandbox-ver など) を無視している
 
 	let binSrc: string;
-	const npmCacheDir = configure.npmCacheDir; // npmCacheDir にはデフォルトパスがあるので、nullにはならない想定
+	const npmCacheDir = configure.npmCacheDir;
 	for (const testType of targetTestTypes) {
 		switch (testType) {
 			// 指定するテストタイプに必要なバイナリキャッシュが存在するか

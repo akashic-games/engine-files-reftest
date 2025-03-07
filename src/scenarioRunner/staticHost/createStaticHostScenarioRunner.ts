@@ -61,7 +61,7 @@ export async function createStaticHostScenarioRunner(hostBin: StaticHost): Promi
 					throw e;
 				}
 			} finally {
-				if (!page?.isClosed()) await page?.close();
+				if (page && !page.isClosed()) await page.close();
 				await browser.close();
 				serveProcess.stop();
 			}
