@@ -45,7 +45,9 @@ export async function createContentOutputReceiver(host: string): Promise<Content
 			}
 			res.status(200).json({meta: {status: 200}});
 		} catch (e) {
-			onError.fire(e);
+			if (e instanceof Error) {
+				onError.fire(e);
+			}
 			next(e);
 		}
 	});

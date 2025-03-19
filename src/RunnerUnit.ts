@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import type { AudioExtractor } from "./audioExtractor/AudioExtractor";
 import { createServeAudioExtractor } from "./audioExtractor/createServeAudioExtractor";
-import type { ReftestConfigure, TestType } from "./configure/ReftestConfigure";
+import type { NormalizedReftestConfigure, TestType } from "./configure/ReftestConfigure";
 import type { NormalizedReftestEntry } from "./configure/ReftestEntry";
 import { createExportHtmlPreprocessor } from "./preprocessor/createExportHtmlPreprocessor";
 import { createExportZipPreprocessor } from "./preprocessor/createExportZipPreprocessor";
@@ -81,7 +81,7 @@ export class RunnerUnit {
 
 interface GetRunnerUnitParameterObject {
 	testType: TestType;
-	configure: ReftestConfigure;
+	configure: NormalizedReftestConfigure;
 }
 
 export async function withRunnerUnit<T>(param: GetRunnerUnitParameterObject, fun: (ru: RunnerUnit) => Promise<T>): Promise<T> {
@@ -95,8 +95,10 @@ export async function withRunnerUnit<T>(param: GetRunnerUnitParameterObject, fun
 
 async function getRunnerUnit(param: GetRunnerUnitParameterObject): Promise<RunnerUnit> {
 	let scenarioRunner: ScenarioRunner;
-	let preprocessor: Preprocessor;
-	let audioExtractor: AudioExtractor;
+	let preprocessor: Preprocessor | null = null;
+	let audioExtractor: AudioExtractor | null = null;
+
+	// npmCacheDir にはデフォルトパスがあるので、nullにはならない想定
 	const downloadDirPath = path.resolve(param.configure.npmCacheDir);
 	const serveBinSrc: TargetBinarySource = param.configure.servePath ?
 		{ type: "local", path: path.resolve(param.configure.servePath) } :

@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 3.3.24
+
+* strict化対応
+* --npm-cache-dir-pathのデフォルトパスを `__bincache` に変更
+
 ## 3.3.23
 
 * akashic-cli 統合後のバージョンの sandbox が扱えない問題を修正

@@ -5,7 +5,7 @@ import { Command } from "commander";
 import * as glob from "glob";
 import { AUDIO_IMAGE_FILE_NAME, THRESHOLD_FOR_AUDIO_IMAGE } from "./audioExtractor/AudioExtractor";
 import type { ReftestCommandOption, TestType} from "./configure/ReftestConfigure";
-import { createReftestConfigure, resolveTestTypes, TEST_TYPES } from "./configure/ReftestConfigure";
+import { createReftestConfigure, resolveTestTypes, TEST_TYPES, DEFAULT_IMAGE_DIFF_THRESHOLD } from "./configure/ReftestConfigure";
 import type { NormalizedReftestEntry, ReftestEntry } from "./configure/ReftestEntry";
 import { normalizeReftestEntry } from "./configure/ReftestEntry";
 import { renderHtmlReport } from "./outputResult/renderHtmlReport";
@@ -21,8 +21,6 @@ import type { FileDiff } from "./util/FileDiff";
 import { initializeNpmDir } from "./util/initializeNpmDir";
 import { mkdirpSync } from "./util/mkdirpSync";
 import { resolveRootDirPath } from "./util/resolveRootDirPath";
-
-const DEFAULT_IMAGE_DIFF_THRESHOLD = 0;
 
 const ver = JSON.parse(fs.readFileSync(path.resolve(__dirname, "..", "package.json"), "utf8")).version;
 
@@ -80,8 +78,8 @@ void (async () => {
 		const diffDirBasePath: string | null = configure.diffDirPath ? path.resolve(configure.diffDirPath) : null;
 		const errorDiffDirBasePath: string | null = configure.errorDiffDirPath ? path.resolve(configure.errorDiffDirPath) : null;
 		const timeoutErrorDirPath: string | null =  configure.timeoutErrorDirPath ? path.resolve(configure.timeoutErrorDirPath) : null;
-		const imageDiffThreshold = configure.threshold ?? DEFAULT_IMAGE_DIFF_THRESHOLD;
-		const reftestResultMap: { [testType in TestType]?: { [contentName: string]: ReftestResult }; } = {};
+		const imageDiffThreshold = configure.threshold;
+		const reftestResultMap: { [testType in TestType]: { [contentName: string]: ReftestResult }; } = Object.create(null);
 		let htmlReportDir: string | null = null;
 		if (configure.outputHtml) {
 			htmlReportDir = path.resolve(configure.outputHtml);
@@ -93,7 +91,7 @@ void (async () => {
 		}
 
 		for (const testType of targetTestTypes) {
-			reftestResultMap[testType] = {};
+			reftestResultMap[testType] = Object.create(null);
 			await withRunnerUnit<void>({testType, configure}, async (runnerUnit) => {
 				for (const reftestEntry of reftestEntries) {
 					const configureHash = createConfigureHash(reftestEntry);
@@ -195,7 +193,7 @@ void (async () => {
 
 		const thresholdErrors: string[] = [];
 		const timeoutErrors: string[] = [];
-		Object.keys(reftestResultMap).flatMap((type: TestType) => {
+		targetTestTypes.flatMap((type: TestType) => {
 			Object.keys(reftestResultMap[type]).map(name => {
 				const status = reftestResultMap[type][name].status;
 				const contentName = [`${name}(${type})`].join(",");

@@ -39,7 +39,6 @@ class LocalTargetBinaryFile implements TargetBinaryFile {
  */
 class PublishedTargetBinaryFile implements TargetBinaryFile {
 	path: string;
-	protected readonly tmpdirPath: string;
 	protected readonly nameInfo: TargetBinaryNameInfo;
 	protected readonly binSrc: TargetBinarySourcePublished;
 

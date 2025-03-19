@@ -3,6 +3,7 @@ import * as path from "path";
 
 const DEFAULT_REFTEST_CONFIGURE = "reftest.config.json";
 
+export const DEFAULT_IMAGE_DIFF_THRESHOLD = 0;
 export const TEST_TYPES = ["sandbox", "serve", "export-zip", "export-html", "android"] as const;
 export type TestType = typeof TEST_TYPES[number];
 export type CommandOptionTestType = TestType | "all" | "all-pc";
@@ -65,10 +66,32 @@ export interface ReftestConfigure {
 	npmCacheDir: string | null;
 }
 
+export interface NormalizedReftestConfigure extends ReftestConfigure {
+	testType: CommandOptionTestType | null;
+	targets: string[];
+	update: boolean;
+	updateDiff: boolean;
+	sandboxVer: string | null;
+	serveVer: string | null;
+	sandboxPath: string | null;
+	servePath: string | null;
+	exportHtmlPath: string | null;
+	exportZipPath: string | null;
+	diffDirPath: string | null;
+	errorDiffDirPath: string | null;
+	threshold: number;
+	android: AndroidConfigure | null;
+	outputHtml: string | null;
+	timeoutErrorDirPath: string | null;
+	useNpmCache: boolean;
+	npmCacheDir: string;
+}
+
+
 // 設定ファイルとコマンド指定されたオプションからReftestConfigureを生成する
 // ここでは設定ファイルとオプションの突き合わせを行うだけで値の整形は行わない。ただし設定ファイルから指定されたパスについては設定ファイルのパスが分からないとパス解決ができないためここでパス解決する
-export function createReftestConfigure(option: ReftestCommandOption): ReftestConfigure {
-	let configurePath: string;
+export function createReftestConfigure(option: ReftestCommandOption): NormalizedReftestConfigure {
+	let configurePath: string | null = null;
 	// 設定ファイル読み込み
 	if (option.configure) {
 		if (!fs.existsSync(path.resolve(option.configure))) {
@@ -123,7 +146,7 @@ export function createReftestConfigure(option: ReftestCommandOption): ReftestCon
 	configure.outputHtml = option.outputHtml ?? resolvePath(dirPath, configure.outputHtml);
 	configure.timeoutErrorDirPath = option.timeoutErrorDirPath ?? resolvePath(dirPath, configure.timeoutErrorDirPath);
 	configure.useNpmCache = option.useNpmCache ?? (configure.useNpmCache ?? false);
-	configure.npmCacheDir = option.npmCacheDirPath ?? resolvePath(dirPath, ".bincache");
+	configure.npmCacheDir = option.npmCacheDirPath ?? null;
 	if (option.androidApkPath || option.androidPlaylogClientPath) {
 		if (!configure.android) {
 			configure.android = {
@@ -140,7 +163,12 @@ export function createReftestConfigure(option: ReftestCommandOption): ReftestCon
 		configure.android.appPackage = option.androidAppPackage ?? (configure.android.appPackage ?? null);
 		configure.android.appActivity = option.androidAppActivity ?? (configure.android.appActivity ?? null);
 	}
-	return configure;
+	const normalizedConfigure: NormalizedReftestConfigure = {
+		...configure,
+		threshold: configure.threshold ?? DEFAULT_IMAGE_DIFF_THRESHOLD,
+		npmCacheDir: configure.npmCacheDir ?? resolvePath(dirPath, "__bincache")! // resolvePath() は第2引数が string なら string を返す
+	};
+	return normalizedConfigure;
 }
 
 export function resolveTestTypes(type: CommandOptionTestType | null | undefined): Readonly<TestType>[] {
@@ -150,6 +178,6 @@ export function resolveTestTypes(type: CommandOptionTestType | null | undefined)
 	);
 }
 
-function resolvePath(dirPath: string, targetPath?: string): string | null {
+function resolvePath(dirPath: string, targetPath: string | null): string | null {
 	return targetPath ? path.resolve(dirPath, targetPath) : null;
 }
