@@ -166,7 +166,7 @@ export function createReftestConfigure(option: ReftestCommandOption): Normalized
 	const normalizedConfigure: NormalizedReftestConfigure = {
 		...configure,
 		threshold: configure.threshold ?? DEFAULT_IMAGE_DIFF_THRESHOLD,
-		npmCacheDir: configure.npmCacheDir ?? resolvePath(dirPath, "__bincache")!
+		npmCacheDir: configure.npmCacheDir ?? resolvePath(dirPath, "__bincache")! // resolvePath() は第2引数が string なら string を返す
 	};
 	return normalizedConfigure;
 }
