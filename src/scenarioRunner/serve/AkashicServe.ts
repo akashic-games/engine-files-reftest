@@ -1,10 +1,11 @@
 import type { ChildProcess } from "child_process";
-import { execSync, spawn } from "child_process";
+import { spawn } from "child_process";
 import * as getPort from "get-port";
 import fetch from "node-fetch";
 import type { TargetBinaryFile } from "../../targetBinary/TargetBinaryFile";
 import { createTargetBinaryFile } from "../../targetBinary/TargetBinaryFile";
 import type { TargetBinarySource } from "../../targetBinary/TargetBinarySource";
+import { execCommand } from "../../util/execCommand";
 import { untilResolve } from "../../util/timerUtil";
 
 export class AkashicServeProcess {
@@ -46,7 +47,7 @@ export class AkashicServe {
 
 	constructor(binFile: TargetBinaryFile) {
 		this._binFile = binFile;
-		this._version = execSync(`node ${this._binFile.path} --version`).toString();
+		this._version = execCommand(`node ${this._binFile.path} --version`);
 	}
 
 	async start(param: StartAkashicServeParameterObject): Promise<AkashicServeProcess> {
