@@ -52,7 +52,6 @@
     "typescript": "^4.8.3"
   },
   "dependencies": {
-    "@akashic/akashic-cli-export": "^2.0.2",
     "@akashic/amflow-util": "^1.4.0",
     "@akashic/game-configuration": "^2.1.0",
     "@akashic/trigger": "^2.1.0",
