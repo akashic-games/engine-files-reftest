@@ -1,8 +1,8 @@
-import { execSync } from "child_process";
 import * as os from "os";
 import * as path from "path";
 import { createTargetBinaryFile } from "../targetBinary/TargetBinaryFile";
 import type { TargetBinarySource } from "../targetBinary/TargetBinarySource";
+import { execCommand } from "../util/execCommand";
 import type { Preprocessor } from "./Preprocessor";
 
 export async function createExportZipPreprocessor(binSrc: TargetBinarySource): Promise<Preprocessor> {
@@ -10,7 +10,7 @@ export async function createExportZipPreprocessor(binSrc: TargetBinarySource): P
 		{ moduleName: "@akashic/akashic-cli-export", binName: "akashic-cli-export-zip" },
 		binSrc
 	);
-	const version = execSync(`node ${exportZipBin.path} --version`).toString();
+	const version = execCommand(`node ${exportZipBin.path} --version`);
 	const getVersionInfo = (): string => {
 		return `export-zip@${version}`;
 	};
@@ -19,7 +19,7 @@ export async function createExportZipPreprocessor(binSrc: TargetBinarySource): P
 			const outputDir = path.join(os.tmpdir(), `exportZipContent_${Date.now()}`);
 			const options = ["--hash-filename", "--force", "--target-service nicolive"];
 			console.log(`akashic-cli-export-zip version: ${version}`);
-			execSync(
+			execCommand(
 				`cd ${contentDirPath} && ` +
 				`node --unhandled-rejections=strict ${exportZipBin.path} -o ${outputDir} ${options.join(" ")}`
 			);

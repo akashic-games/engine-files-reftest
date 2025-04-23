@@ -1,6 +1,7 @@
 import type { ChildProcess } from "child_process";
-import { execSync, exec } from "child_process";
+import { exec } from "child_process";
 import * as os from "os";
+import { execCommand } from "../../util/execCommand";
 import { untilResolve, withTimeLimit } from "../../util/timerUtil";
 
 const TIMEOUT = 30000;
@@ -17,7 +18,7 @@ export class AndroidEmulatorProcess {
 	}
 
 	getVersionInfo(): string {
-		const infoStrs = execSync("emulator -version").toString().split("\n");
+		const infoStrs = execCommand("emulator -version").split("\n");
 		return infoStrs[0];
 	}
 }
@@ -28,7 +29,7 @@ interface AndroidEmulatorParameterObject {
 
 export async function createAndroidEmulator(param: AndroidEmulatorParameterObject): Promise<AndroidEmulatorProcess> {
 	let emulatorName = param.emulatorName;
-	const emulators = execSync("emulator -list-avds").toString().split(os.EOL).filter(name => name !== "");
+	const emulators = execCommand("emulator -list-avds").split(os.EOL).filter(name => name !== "");
 	if (!emulatorName) {
 		// emulatorが指定されていない時は最初に作られたemulatorをそのまま利用する
 		if (emulators.length < 1) {
@@ -43,7 +44,7 @@ export async function createAndroidEmulator(param: AndroidEmulatorParameterObjec
 	// emulatorが起動するのを待つ
 	const checkStarting = async (resolve: (value?: unknown) => void, reject: (err?: Error) => void): Promise<void> => {
 		// emulatorが起動していることを確認
-		const emulatorsInfo = execSync("adb devices").toString().split(os.EOL).filter(name => name !== "");
+		const emulatorsInfo = execCommand("adb devices").split(os.EOL).filter(name => name !== "");
 		// emulatorが無くても「List of devices attached」という文字列だけは表示されるので要素数が2以上の時をemulatorが存在すると判定
 		if (emulatorsInfo.length < 2) {
 			reject(new Error("not found emulators"));

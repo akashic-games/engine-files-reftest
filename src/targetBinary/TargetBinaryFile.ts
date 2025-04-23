@@ -1,5 +1,5 @@
-import { execSync } from "child_process";
 import * as path from "path";
+import { execCommand } from "../util/execCommand";
 import type { TargetBinaryNameInfo } from "./TargetBinaryNameInfo";
 import type { TargetBinarySource, TargetBinarySourceLocal, TargetBinarySourcePublished } from "./TargetBinarySource";
 
@@ -50,7 +50,7 @@ class PublishedTargetBinaryFile implements TargetBinaryFile {
 		this.nameInfo = nameInfo;
 		this.binSrc = binSrc;
 		withCwdSync(this.binSrc.downloadDirPath, () => {
-			execSync(`npm i ${nameInfo.moduleName}@${binSrc.version ?? "latest"}`);
+			execCommand(`npm i ${nameInfo.moduleName}@${binSrc.version ?? "latest"}`);
 			this.path = path.join(binSrc.downloadDirPath, "node_modules", ".bin", nameInfo.binName);
 		});
 	}

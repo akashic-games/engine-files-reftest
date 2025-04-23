@@ -1,6 +1,6 @@
-import { execSync } from "child_process";
 import * as fs from "fs";
 import type { NormalizedReftestConfigure } from "../configure/ReftestConfigure";
+import { execCommand } from "./execCommand";
 // キャッシュディレクトリを初期化する関数
 export function initializeNpmDir(configure: NormalizedReftestConfigure): void {
 	const npmCacheDir = configure.npmCacheDir;
@@ -10,7 +10,7 @@ export function initializeNpmDir(configure: NormalizedReftestConfigure): void {
 	const cwd = process.cwd();
 	try {
 		process.chdir(npmCacheDir);
-		execSync("npm init -y");
+		execCommand("npm init -y");
 	} finally {
 		process.chdir(cwd);
 	}
