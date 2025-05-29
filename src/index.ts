@@ -158,7 +158,7 @@ void (async () => {
 						}
 
 						reftestResultMap[testType][reftestEntryPath] = {
-							fileDiffs: diffs,
+							fileDiffs: errors,
 							status: (output.status === "skipped-unsupported") ? "skipped" :
 									(output.status === "timeout") ? "timeout" :
 									(errors.length === 0 ? "succeeded" : "failed")

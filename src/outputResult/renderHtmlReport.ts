@@ -44,13 +44,11 @@ export async function renderHtmlReport(param: RenderContentResultParameterObject
 	}
 
 	const results: ResultForRender[] = [];
-	const diffImagesDirPath = fs.mkdtempSync(path.join(os.tmpdir(), "reftest-diff-images-"));
 	for (const fileDiff of param.reftestResult.fileDiffs) {
 		const expectedImagePath = await compressImage(fileDiff.expectedPath, expectedDirPath);
 		const outputImagePath = await compressImage(fileDiff.targetPath, outputDirPath);
-		const diffImageSrcPath = path.join(diffImagesDirPath, path.basename(fileDiff.expectedPath));
-		fs.writeFileSync(diffImageSrcPath, fileDiff.content);
-		const diffImagePath = await compressImage(diffImageSrcPath, diffDirPath);
+		const diffImagePath = path.join(diffDirPath, path.basename(fileDiff.expectedPath));
+		fs.writeFileSync(diffImagePath, fileDiff.content);
 		results.push({
 			expectedImage: path.relative(contentDirPath, expectedImagePath),
 			outputImage: path.relative(contentDirPath, outputImagePath),
@@ -58,8 +56,6 @@ export async function renderHtmlReport(param: RenderContentResultParameterObject
 			diffRate: parseFloat(fileDiff.difference.toFixed(5))
 		});
 	}
-	// このディレクトリはhtml側にdiff画像を生成する処理で一時的に作成したものなのでここで削除しておく
-	fs.rmdirSync(diffImagesDirPath, { recursive: true });
 	const templatePath = path.resolve(__dirname, "../../templates/contentResult.ejs");
 	const content = fs.readFileSync(templatePath, "utf8");
 	const rendered = ejs.render(
