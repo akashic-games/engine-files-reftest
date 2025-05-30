@@ -4,14 +4,6 @@
   <meta charset="UTF-8">
   <title><%- contentDirPath %>の<%- testType %>モードでの実行結果</title>
   <link rel="icon" href="/favicon.ico" type="image/vnd.microsoft.icon">
-  <style>
-    table 	{
-      border-collapse:collapse
-    }
-    table td	{
-      border:1px solid red;
-    }
-  </style>
 </head>
 <body>
   <h1><%- contentDirPath %>の<%- testType %>モードでの実行結果</h1>
@@ -20,8 +12,6 @@
   <% if (timeoutImage) { %>
     タイムアウト時のスクリーンショット<br/>
     <img src="<%= timeoutImage %>">
-  <% } else if (results.length === 0){ %>
-    <p>正常終了</p>
   <% } else { %>
     <table>
       <tr>
@@ -32,10 +22,19 @@
       </tr>
       <% for (var result of results) { %>
         <% result.status %>
-        <tr>
+        <% const isDifferent = result.diffRate > threshold %>
+        <tr bgColor="<%= isDifferent ? 'red' : 'green' %>">
           <td><img src="<%= result.expectedImage %>" alt=""></td>
           <td><img src="<%= result.outputImage %>" alt=""></td>
-          <td><img src="<%= result.diffImage %>" alt=""></td>
+          <% if (isDifferent) { %>
+            <td>
+              <a href="<%= result.diffImage %>" target="_blank">
+                <img width="400" height="200" src="<%= result.diffImage %>" alt="">
+              </a>
+            </td>
+          <% } else { %>
+            <td style="background-color: white; border: 1px solid green"></td>
+          <% } %>
           <td><%= 100 * result.diffRate %>%</td>
         </tr>
       <% } %>
