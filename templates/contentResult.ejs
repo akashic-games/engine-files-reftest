@@ -25,7 +25,15 @@
         <tr bgColor="<%= result.diffRate > threshold ? 'red' : 'green' %>">
           <td><img src="<%= result.expectedImage %>" alt=""></td>
           <td><img src="<%= result.outputImage %>" alt=""></td>
-          <td><img src="<%= result.diffImage %>" alt=""></td>
+          <% if (result.diffRate !== 0) { %>
+            <td>
+              <a href="<%= result.diffImage %>" target="_blank">
+                <img width="400" height="200" src="<%= result.diffImage %>" alt="">
+              </a>
+            </td>
+          <% } else { %>
+            <td style="background-color: white; border: 1px solid green; text-align: center">N/A</td>
+          <% } %>
           <td><%= 100 * result.diffRate %>%</td>
         </tr>
       <% } %>
