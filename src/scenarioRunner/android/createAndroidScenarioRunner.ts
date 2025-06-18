@@ -15,6 +15,7 @@ import { createAkashicServe } from "../serve/AkashicServe";
 import { createAndroidEmulator } from "./AndroidEmulator";
 
 const CONTENT_LIMIT_TIME = 300000; // コンテンツ実行時間の上限
+const ANDROID_ELEMENT_TIMEOUT = 5000; // Androidエミュレータの要素取得タイムアウト
 
 interface CreateAndroidScenarioRunnerParameterObject {
 	serveBinSrc: TargetBinarySource;
@@ -79,7 +80,9 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 			try {
 				if (mode === "replay") {
 					const modeButton = await client.$("id:active");
-					await modeButton.click();
+					if (await modeButton.waitForDisplayed({ timeout: ANDROID_ELEMENT_TIMEOUT })) {
+						await modeButton.click();
+					}
 				}
 				for (let playCount = 0; playCount < playTimes; playCount++) {
 					const contentWaiter = createWaiter();
@@ -96,9 +99,13 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 					});
 					// passiveモードでコンテンツを起動するための処理
 					const urlField = await client.$("id:url");
-					await urlField.setValue(`${serveProcess.url}/contents/0/content.raw.json`);
+					if (await urlField.waitForDisplayed({ timeout: ANDROID_ELEMENT_TIMEOUT })) {
+						await urlField.setValue(`${serveProcess.url}/contents/0/content.raw.json`);
+					}
 					const button = await client.$("id:connect");
-					await button.click();
+					if (await button.waitForDisplayed({ timeout: ANDROID_ELEMENT_TIMEOUT })) {
+						await button.click();
+					}
 
 					// コンテンツにエラーが発生した場合、コンテンツは止まってしまってcontentWaiterも解除できないので、制限時間を設けておく
 					await withTimeLimit(CONTENT_LIMIT_TIME, "content did not end in time", () => {
@@ -117,7 +124,9 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 
 					// Playのリセット。Playが1つだけ起動していることの確認も兼ねて「STOP 1 GAME」ボタンのみ実行
 					const stopButton = await client.$("id:stop");
-					await stopButton.click();
+					if (await stopButton.waitForDisplayed({ timeout: ANDROID_ELEMENT_TIMEOUT })) {
+						await stopButton.click();
+					}
 				}
 				await client.deleteSession();
 			} finally {
