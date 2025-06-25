@@ -80,11 +80,7 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 			try {
 				if (mode === "replay") {
 					const modeButton = await client.$("id:active");
-					if (await modeButton.waitForDisplayed({ timeout: ANDROID_ELEMENT_TIMEOUT })) {
-						await modeButton.click();
-					} else {
-						throwErrorWithMessage("mode button(id:active) is not displayed");
-					}
+					await runByAndroidElement(modeButton, () => modeButton.click(), "mode button(id:active) is not displayed");
 				}
 				for (let playCount = 0; playCount < playTimes; playCount++) {
 					const contentWaiter = createWaiter();
@@ -101,17 +97,13 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 					});
 					// passiveモードでコンテンツを起動するための処理
 					const urlField = await client.$("id:url");
-					if (await urlField.waitForDisplayed({ timeout: ANDROID_ELEMENT_TIMEOUT })) {
-						await urlField.setValue(`${serveProcess.url}/contents/0/content.raw.json`);
-					} else {
-						throwErrorWithMessage("url field(id:url) is not displayed");
-					}
+					await runByAndroidElement(
+						urlField,
+						() => urlField.setValue(`${serveProcess.url}/contents/0/content.raw.json`),
+						"url field(id:url) is not displayed"
+					);
 					const button = await client.$("id:connect");
-					if (await button.waitForDisplayed({ timeout: ANDROID_ELEMENT_TIMEOUT })) {
-						await button.click();
-					} else {
-						throwErrorWithMessage("connect button(id:connect) is not displayed");
-					}
+					await runByAndroidElement(button, () => button.click(), "connect button(id:connect) is not displayed");
 					// コンテンツにエラーが発生した場合、コンテンツは止まってしまってcontentWaiterも解除できないので、制限時間を設けておく
 					await withTimeLimit(CONTENT_LIMIT_TIME, "content did not end in time", () => {
 						return mode === "replay" ?
@@ -129,11 +121,7 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 
 					// Playのリセット。Playが1つだけ起動していることの確認も兼ねて「STOP 1 GAME」ボタンのみ実行
 					const stopButton = await client.$("id:stop");
-					if (await stopButton.waitForDisplayed({ timeout: ANDROID_ELEMENT_TIMEOUT })) {
-						await stopButton.click();
-					} else {
-						throwErrorWithMessage("stop button(id:stop) is not displayed");
-					}
+					await runByAndroidElement(stopButton, () => stopButton.click(), "stop button(id:stop) is not displayed");
 				}
 				await client.deleteSession();
 			} finally {
@@ -153,7 +141,13 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 	};
 }
 
-function throwErrorWithMessage(message: string): never {
-	console.error(message);
-	throw new Error(message);
+// 指定した要素が表示されている場合にfuncを実行し、表示されていない場合はエラーメッセージを出力してエラーを投げる
+async function runByAndroidElement(element: wdio.Element, func: () => Promise<void>, errorMessage: string): Promise<void> {
+	// 表示に時間がかかる場合があるため、waitForDisplayedを使用して表示されるまで待機する
+	if (await element.waitForDisplayed({ timeout: ANDROID_ELEMENT_TIMEOUT })) {
+		await func();
+	} else {
+		console.error(errorMessage);
+		throw new Error(errorMessage);
+	}
 }
