@@ -82,6 +82,8 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 					const modeButton = await client.$("id:active");
 					if (await modeButton.waitForDisplayed({ timeout: ANDROID_ELEMENT_TIMEOUT })) {
 						await modeButton.click();
+					} else {
+						throwErrorWithMessage("mode button(id:active) is not displayed");
 					}
 				}
 				for (let playCount = 0; playCount < playTimes; playCount++) {
@@ -101,12 +103,15 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 					const urlField = await client.$("id:url");
 					if (await urlField.waitForDisplayed({ timeout: ANDROID_ELEMENT_TIMEOUT })) {
 						await urlField.setValue(`${serveProcess.url}/contents/0/content.raw.json`);
+					} else {
+						throwErrorWithMessage("url field(id:url) is not displayed");
 					}
 					const button = await client.$("id:connect");
 					if (await button.waitForDisplayed({ timeout: ANDROID_ELEMENT_TIMEOUT })) {
 						await button.click();
+					} else {
+						throwErrorWithMessage("connect button(id:connect) is not displayed");
 					}
-
 					// コンテンツにエラーが発生した場合、コンテンツは止まってしまってcontentWaiterも解除できないので、制限時間を設けておく
 					await withTimeLimit(CONTENT_LIMIT_TIME, "content did not end in time", () => {
 						return mode === "replay" ?
@@ -126,6 +131,8 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 					const stopButton = await client.$("id:stop");
 					if (await stopButton.waitForDisplayed({ timeout: ANDROID_ELEMENT_TIMEOUT })) {
 						await stopButton.click();
+					} else {
+						throwErrorWithMessage("stop button(id:stop) is not displayed");
 					}
 				}
 				await client.deleteSession();
@@ -144,4 +151,9 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 			return serveBin.getVersionInfo() + ", " + emulatorProcess.getVersionInfo();
 		}
 	};
+}
+
+function throwErrorWithMessage(message: string): never {
+	console.error(message);
+	throw new Error(message);
 }
