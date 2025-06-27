@@ -15,7 +15,7 @@ import { createAkashicServe } from "../serve/AkashicServe";
 import { createAndroidEmulator } from "./AndroidEmulator";
 
 const CONTENT_LIMIT_TIME = 300000; // コンテンツ実行時間の上限
-const ANDROID_ELEMENT_TIMEOUT = 5000; // Androidエミュレータの要素取得タイムアウト
+const ANDROID_ELEMENT_TIMEOUT = 10000; // Androidエミュレータの要素取得タイムアウト
 
 interface CreateAndroidScenarioRunnerParameterObject {
 	serveBinSrc: TargetBinarySource;
