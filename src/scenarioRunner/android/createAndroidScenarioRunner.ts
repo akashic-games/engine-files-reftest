@@ -80,7 +80,8 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 			try {
 				if (mode === "replay") {
 					const modeButton = await client.$("id:active");
-					await runByAndroidElement(modeButton, () => modeButton.click(), "mode button(id:active) is not displayed");
+					await assertDisplayed(modeButton, "mode button(id:active) is not displayed");
+					await modeButton.click();
 				}
 				for (let playCount = 0; playCount < playTimes; playCount++) {
 					const contentWaiter = createWaiter();
@@ -97,13 +98,11 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 					});
 					// passiveモードでコンテンツを起動するための処理
 					const urlField = await client.$("id:url");
-					await runByAndroidElement(
-						urlField,
-						() => urlField.setValue(`${serveProcess.url}/contents/0/content.raw.json`),
-						"url field(id:url) is not displayed"
-					);
+					await assertDisplayed(urlField, "url field(id:url) is not displayed");
+					await urlField.setValue(`${serveProcess.url}/contents/0/content.raw.json`);
 					const button = await client.$("id:connect");
-					await runByAndroidElement(button, () => button.click(), "connect button(id:connect) is not displayed");
+					await assertDisplayed(button, "connect button(id:connect) is not displayed");
+					await button.click();
 					// コンテンツにエラーが発生した場合、コンテンツは止まってしまってcontentWaiterも解除できないので、制限時間を設けておく
 					await withTimeLimit(CONTENT_LIMIT_TIME, "content did not end in time", () => {
 						return mode === "replay" ?
@@ -121,7 +120,8 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 
 					// Playのリセット。Playが1つだけ起動していることの確認も兼ねて「STOP 1 GAME」ボタンのみ実行
 					const stopButton = await client.$("id:stop");
-					await runByAndroidElement(stopButton, () => stopButton.click(), "stop button(id:stop) is not displayed");
+					await assertDisplayed(stopButton, "stop button(id:stop) is not displayed");
+					await stopButton.click();
 				}
 				await client.deleteSession();
 			} finally {
@@ -141,12 +141,10 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 	};
 }
 
-// 指定した要素が表示されている場合にfuncを実行し、表示されていない場合はエラーメッセージを出力してエラーを投げる
-async function runByAndroidElement(element: wdio.Element, func: () => Promise<void>, errorMessage: string): Promise<void> {
+// 指定した要素の表示を確認する、表示されていない場合はエラーメッセージを出力してエラーを投げる
+async function assertDisplayed(element: wdio.Element, errorMessage: string): Promise<void> {
 	// 表示に時間がかかる場合があるため、waitForDisplayedを使用して表示されるまで待機する
-	if (await element.waitForDisplayed({ timeout: ANDROID_ELEMENT_TIMEOUT })) {
-		await func();
-	} else {
+	if (!await element.waitForDisplayed({ timeout: ANDROID_ELEMENT_TIMEOUT })) {
 		console.error(errorMessage);
 		throw new Error(errorMessage);
 	}
