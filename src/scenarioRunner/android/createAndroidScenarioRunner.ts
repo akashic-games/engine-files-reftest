@@ -15,6 +15,7 @@ import { createAkashicServe } from "../serve/AkashicServe";
 import { createAndroidEmulator } from "./AndroidEmulator";
 
 const CONTENT_LIMIT_TIME = 300000; // コンテンツ実行時間の上限
+const ANDROID_ELEMENT_TIMEOUT = 10000; // Androidエミュレータの要素取得タイムアウト
 
 interface CreateAndroidScenarioRunnerParameterObject {
 	serveBinSrc: TargetBinarySource;
@@ -79,6 +80,7 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 			try {
 				if (mode === "replay") {
 					const modeButton = await client.$("id:active");
+					await assertDisplayed(modeButton, "mode button(id:active) is not displayed");
 					await modeButton.click();
 				}
 				for (let playCount = 0; playCount < playTimes; playCount++) {
@@ -96,10 +98,11 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 					});
 					// passiveモードでコンテンツを起動するための処理
 					const urlField = await client.$("id:url");
+					await assertDisplayed(urlField, "url field(id:url) is not displayed");
 					await urlField.setValue(`${serveProcess.url}/contents/0/content.raw.json`);
 					const button = await client.$("id:connect");
+					await assertDisplayed(button, "connect button(id:connect) is not displayed");
 					await button.click();
-
 					// コンテンツにエラーが発生した場合、コンテンツは止まってしまってcontentWaiterも解除できないので、制限時間を設けておく
 					await withTimeLimit(CONTENT_LIMIT_TIME, "content did not end in time", () => {
 						return mode === "replay" ?
@@ -117,6 +120,7 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 
 					// Playのリセット。Playが1つだけ起動していることの確認も兼ねて「STOP 1 GAME」ボタンのみ実行
 					const stopButton = await client.$("id:stop");
+					await assertDisplayed(stopButton, "stop button(id:stop) is not displayed");
 					await stopButton.click();
 				}
 				await client.deleteSession();
@@ -135,4 +139,13 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 			return serveBin.getVersionInfo() + ", " + emulatorProcess.getVersionInfo();
 		}
 	};
+}
+
+// 指定した要素の表示を確認する、表示されていない場合はエラーメッセージを出力してエラーを投げる
+async function assertDisplayed(element: wdio.Element, errorMessage: string): Promise<void> {
+	// 表示に時間がかかる場合があるため、waitForDisplayedを使用して表示されるまで待機する
+	if (!await element.waitForDisplayed({ timeout: ANDROID_ELEMENT_TIMEOUT })) {
+		console.error(errorMessage);
+		throw new Error(errorMessage);
+	}
 }
