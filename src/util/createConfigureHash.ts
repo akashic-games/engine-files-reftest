@@ -21,7 +21,7 @@ export function createConfigureHash(reftestEntry: NormalizedReftestEntry): strin
 	const gameJsonFile = fs.readFileSync(gameJsonPath);
 	sha256hash.update(gameJsonFile);
 	// game.json 以下のディレクトリ全ての追加
-	// eslint-disable-next-line @typescript-eslint/no-var-requires
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
 	const gameConfiguration = require(gameJsonPath);
 	const audioExtensionResolver = (asset: AudioAssetConfigurationBase): string[] => {
 		if (asset.hint?.extensions) {
