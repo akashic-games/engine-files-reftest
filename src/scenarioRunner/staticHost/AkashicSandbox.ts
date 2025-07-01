@@ -11,7 +11,9 @@ import type { StaticHost, StaticHostParameterObject, StaticHostProcess } from ".
 
 export class AkashicSandboxProcess implements StaticHostProcess {
 	readonly url: string;
-	readonly canvasSelector: string = ".input-handler > canvas";
+	// v3 では input-handler がない。しかしそれとは別に、serve ベースの sandbox は (デフォルトでは) canvas は一つしかないので、そこから辿る。ただしこれは暫定対応
+	// readonly canvasSelector: string = ".input-handler > canvas";
+	readonly canvasSelector: string = "#container > div > canvas";
 	protected _process: ChildProcess;
 
 	constructor(process: ChildProcess, url: string) {
