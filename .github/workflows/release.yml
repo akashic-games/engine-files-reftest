@@ -17,9 +17,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          # CHANGELOG の差分を適切に生成するため明示的にすべての履歴を取得
-          fetch-depth: 0
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -29,11 +26,8 @@ jobs:
         run: |
           npm ci
           npm test
-      - name: Create Release PullRequest or Publish
-        uses: changesets/action@v1
+      - name: Publish and Release
+        uses: akashic-games/action-release@v2
         with:
-          publish: npm run release-packages
-          version: npm run version-packages
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          npm_token: ${{ secrets.NPM_TOKEN }}
