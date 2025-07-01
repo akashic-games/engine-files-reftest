@@ -3,7 +3,7 @@ import * as pngjs from "pngjs";
 import type { FileDiff } from "./FileDiff";
 
 // @types/pixelmatchを利用するためにはesModuleInteropを有効にする必要があるが、その場合他箇所のビルドにも影響が出るためrequireを使用
-/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable @typescript-eslint/no-require-imports */
 const pixelmatch = require("pixelmatch");
 
 interface VerifyImageParameterObject {

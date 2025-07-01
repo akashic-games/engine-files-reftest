@@ -19,7 +19,7 @@ import { renderAudioWaveform } from "./renderAudioWaveform";
 const CONTENT_LIMIT_TIME = 300000; // コンテンツ実行時間の上限
 
 export async function createServeAudioExtractor(binSrc: TargetBinarySource): Promise<AudioExtractor> {
-	/* eslint-disable @typescript-eslint/no-var-requires */
+	/* eslint-disable @typescript-eslint/no-require-imports */
 	const ps = require("puppeteer-stream");
 	const serveBin = await createAkashicServe(binSrc);
 	return {

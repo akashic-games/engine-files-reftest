@@ -12,7 +12,7 @@ export function copyContentFiles(contentDir: string): string {
 	const contentDirPath = fs.mkdtempSync(path.join(os.tmpdir(), "reftest-tmp-content"));
 	const gameJsonPath = path.resolve(contentDir, "game.json");
 	cpx.copySync(gameJsonPath, contentDirPath);
-	/* eslint-disable @typescript-eslint/no-var-requires */
+	/* eslint-disable @typescript-eslint/no-require-imports */
 	const gameConfiguration = require(gameJsonPath);
 	const audioExtensionResolver = (asset: AudioAssetConfigurationBase): string[] => {
 		if (asset.hint?.extensions) {

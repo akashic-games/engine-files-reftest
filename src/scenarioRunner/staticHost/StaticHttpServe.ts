@@ -3,7 +3,7 @@ import * as getPort from "get-port";
 import type { StaticHost, StaticHostParameterObject, StaticHostProcess } from "./StaticHost";
 
 // @types/serve-handlerを利用するためにはesModuleInteropを有効にする必要があるが、その場合他箇所のビルドにも影響が出るためrequireを使用
-/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable @typescript-eslint/no-require-imports */
 const handler = require("serve-handler");
 
 export class StaticHttpServeProcess implements StaticHostProcess {
