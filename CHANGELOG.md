@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Unreleased changes
+## 3.3.28
 
 * akashic sandbox 環境で、passiveモードのv3コンテンツが動作しなくなる不具合の修正
 
