@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.3.28
+
+* akashic sandbox 環境で、passiveモードのv3コンテンツが動作しなくなる不具合の修正
+
 ## 3.3.27
 
 * Android モードで DOM 要素の表示を待機するように
