@@ -50,6 +50,7 @@ commander
 	.option("--android-app-activity <name>", "Name of android app-activity")
 	.option("--output-html <path>", "Output result of reftest as html file")
 	.option("--timeout-error-dir-path <path>", "Path to output screenshot at timeout")
+	.option("--error-screenshot-dir-path <path>", "Path to output screenshot at error")
 	.option("--use-npm-cache", "Use cache npm binaries")
 	.option("--npm-cache-dir-path <path>",
 		"Path to save npm. If not specified default path is './.npmcache' or if configurePath is specified 'CONFIGURE_PATH/../.npmcache'"
@@ -78,6 +79,8 @@ void (async () => {
 		const diffDirBasePath: string | null = configure.diffDirPath ? path.resolve(configure.diffDirPath) : null;
 		const errorDiffDirBasePath: string | null = configure.errorDiffDirPath ? path.resolve(configure.errorDiffDirPath) : null;
 		const timeoutErrorDirPath: string | null =  configure.timeoutErrorDirPath ? path.resolve(configure.timeoutErrorDirPath) : null;
+		const errorScreenshotDirPath: string | null =  configure.errorScreenshotDirPath ?
+			path.resolve(configure.errorScreenshotDirPath) : null;
 		const imageDiffThreshold = configure.threshold;
 		const reftestResultMap: { [testType in TestType]: { [contentName: string]: ReftestResult }; } = Object.create(null);
 		let htmlReportDir: string | null = null;
@@ -109,7 +112,19 @@ void (async () => {
 					const expectedDir = path.resolve(reftestEntry.expectedDirPath, testType);
 					console.log(`finish a runnerUnit (testType : ${testType})`);
 					if (mode === "update-expected" || mode === "update-expected-only-diff") {
-						if (output.status === "timeout") throw new Error("Timeout Error");
+						if (output.status === "timeout") {
+							if (timeoutErrorDirPath) {
+								output.timeoutImage.fileName = `${testType}_${output.timeoutImage.fileName}`;
+								outputScreenshots([output.timeoutImage], timeoutErrorDirPath);
+							}
+							throw new Error("Timeout Error");
+						} else if (output.status === "error") {
+							if (errorScreenshotDirPath) {
+								output.errorScreenshot.fileName = `${testType}_${output.errorScreenshot.fileName}`;
+								outputScreenshots([output.errorScreenshot], errorScreenshotDirPath);
+							}
+							throw output.error;
+						}
 						if (fs.existsSync(expectedDir)) {
 							fs.rmdirSync(expectedDir, { recursive: true }); // 前回のテスト結果が残っていたら消す
 						}
@@ -132,7 +147,7 @@ void (async () => {
 						let diffs: FileDiff[] = [];
 						let errors: FileDiff[] = [];
 						let timeoutImagePath = "";
-						if (output.status !== "timeout") {
+						if (output.status !== "timeout" && output.status !== "error") {
 							outputScreenshots(output.screenshots, outputDir);
 							diffs = output.status === "skipped-unsupported" ? [] : diffDirectory(expectedDir, outputDir);
 							errors = diffs.filter(d => {
@@ -149,12 +164,16 @@ void (async () => {
 							if (errorDiffDirBasePath) {
 								outputDiffImages(errors, path.join(errorDiffDirBasePath, reftestEntryPath, testType));
 							}
-						} else {
-							if (timeoutErrorDirPath && output.timeoutImage) {
-								output.timeoutImage.fileName = `${testType}_${output.timeoutImage.fileName}`;
-								outputScreenshots([output.timeoutImage], timeoutErrorDirPath);
-								timeoutImagePath = path.join(timeoutErrorDirPath, output.timeoutImage.fileName);
+						} else if (output.status === "timeout" && timeoutErrorDirPath) {
+							output.timeoutImage.fileName = `${testType}_${output.timeoutImage.fileName}`;
+							outputScreenshots([output.timeoutImage], timeoutErrorDirPath);
+							timeoutImagePath = path.join(timeoutErrorDirPath, output.timeoutImage.fileName);
+						} else if (output.status === "error") {
+							if (errorScreenshotDirPath) {
+								output.errorScreenshot.fileName = `${testType}_${output.errorScreenshot.fileName}`;
+								outputScreenshots([output.errorScreenshot], errorScreenshotDirPath);
 							}
+							throw output.error;
 						}
 
 						reftestResultMap[testType][reftestEntryPath] = {

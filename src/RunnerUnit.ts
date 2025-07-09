@@ -49,7 +49,7 @@ export class RunnerUnit {
 			entry.executionMode,
 			entry.playTimes
 		);
-		if (entry.enableAudio && this.audioExtractor && ret.status !== "timeout") {
+		if (entry.enableAudio && this.audioExtractor && ret.status !== "timeout" && ret.status !== "error") {
 			const additional = await this.audioExtractor.run(
 				path.resolve(contentDirPath),
 				path.resolve(entry.scenario.path),

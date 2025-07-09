@@ -23,6 +23,7 @@ describe("ReftestConfigure", () => {
 				android: null,
 				outputHtml: null,
 				timeoutErrorDirPath: null,
+				errorScreenshotDirPath: null,
 				useNpmCache: false,
 				npmCacheDir: path.resolve(".", "__bincache")
 			});
@@ -45,6 +46,7 @@ describe("ReftestConfigure", () => {
 				threshold: 0,
 				outputHtml: null,
 				timeoutErrorDirPath: null,
+				errorScreenshotDirPath: null,
 				useNpmCache: false,
 				npmCacheDir: path.resolve(path.resolve(__dirname, "../fixture"), "__bincache")
 			});
@@ -82,6 +84,7 @@ describe("ReftestConfigure", () => {
 				threshold: 0.03,
 				outputHtml: null,
 				timeoutErrorDirPath: null,
+				errorScreenshotDirPath: null,
 				useNpmCache: false,
 				npmCacheDir: path.resolve(path.resolve(__dirname, "../fixture"), "__bincache"),
 				android: {

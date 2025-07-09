@@ -13,8 +13,13 @@ interface ReftestOutputTimeout {
 	status: "timeout";
 	timeoutImage: Screenshot;
 }
+interface ReftestOutputError {
+	status: "error";
+	errorScreenshot: Screenshot;
+	error: any;
+}
 
-export type ReftestOutput = ReftestOutputSucceeded | ReftestOutputSkipped | ReftestOutputTimeout;
+export type ReftestOutput = ReftestOutputSucceeded | ReftestOutputSkipped | ReftestOutputTimeout | ReftestOutputError;
 
 export interface ScenarioRunner {
 	/**

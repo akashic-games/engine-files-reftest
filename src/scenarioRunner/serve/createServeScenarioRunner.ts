@@ -99,6 +99,13 @@ export async function createServeScenarioRunner(binSrc: TargetBinarySource): Pro
 					};
 					return { status: "timeout", timeoutImage };
 				} else {
+					if (page && !page.isClosed()) {
+						const errorScreenshot: Screenshot = {
+							fileName: `error_try${playCount}_${extractDirname(scenarioPath)}.png`,
+							base64: await page.screenshot({ encoding: "base64" })
+						};
+						return { status: "error", errorScreenshot, error: e };
+					}
 					throw e;
 				}
 			} finally {

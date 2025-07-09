@@ -5,6 +5,7 @@ import type { TargetBinarySource } from "../../targetBinary/TargetBinarySource";
 import type { ExecutionMode } from "../../types/ExecutionMode";
 import type { Screenshot } from "../../types/Screenshot";
 import { createWaiter } from "../../util/createWaiter";
+import { extractDirname } from "../../util/extractDirname";
 import { withTimeLimit } from "../../util/timerUtil";
 import { createAppiumServer } from "../AppiumServer";
 import { createContentOutputReceiver } from "../createContentOutputReceiver";
@@ -123,8 +124,15 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 					await assertDisplayed(stopButton, "stop button(id:stop) is not displayed");
 					await stopButton.click();
 				}
-				await client.deleteSession();
+			} catch (e) {
+				// エラーが発生した場合は、コンテンツのスクリーンショットを取得しておく
+				const errorScreenshot: Screenshot = {
+					fileName: `error_try${screenshots.length}_${extractDirname(scenarioPath)}.png`,
+					base64: await client.takeScreenshot()
+				};
+				return { status: "error", errorScreenshot, error: e };
 			} finally {
+				await client.deleteSession();
 				await serveProcess.stop();
 				contentOutputReceiver.server.close();
 			}
