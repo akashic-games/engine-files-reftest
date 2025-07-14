@@ -1,3 +1,5 @@
+import * as fs from "fs";
+import * as path from "path";
 import * as puppeteer from "puppeteer";
 import type { ExecutionMode } from "../../types/ExecutionMode";
 import type { Screenshot } from "../../types/Screenshot";
@@ -40,13 +42,20 @@ export async function createStaticHostScenarioRunner(hostBin: StaticHost): Promi
 					await page.goto(serveProcess.url);
 					// 稀に終了メッセージを流す前にコンテンツが終了することがあるため、コンテンツが確実に終了している時間を経過したら強制的に待機を解除する処理を用意した
 					await withTimeLimit(CONTENT_LIMIT_TIME, "content did not end in time", () => {
+						const gameJsonPath = path.resolve(contentDirPath, "game.json");
 						// この時点で、page は代入済みのはず
-						return evaluateScenarioByPuppeteer(page!, scenarioPath, (s: Screenshot) => {
-							screenshots.push({
-								fileName: `try${playCount}_${s.fileName}`,
-								base64: s.base64
-							});
-						}, serveProcess.canvasSelector);
+						return evaluateScenarioByPuppeteer(
+							page!,
+							scenarioPath,
+							fs.existsSync(gameJsonPath) ? gameJsonPath : undefined, // game.json が存在しない環境で実行することもあり得るため
+							(s: Screenshot) => {
+								screenshots.push({
+									fileName: `try${playCount}_${s.fileName}`,
+									base64: s.base64
+								});
+							},
+							serveProcess.canvasSelector
+						);
 					});
 					await page.close();
 				}

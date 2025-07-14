@@ -1,3 +1,4 @@
+import * as path from "path";
 import { calculateFinishedTime } from "@akashic/amflow-util/lib/calculateFinishedTime";
 import * as puppeteer from "puppeteer";
 import type { TargetBinarySource } from "../../targetBinary/TargetBinarySource";
@@ -76,9 +77,14 @@ export async function createServeScenarioRunner(binSrc: TargetBinarySource): Pro
 					await withTimeLimit(Math.min(expectedTime, CONTENT_LIMIT_MAX_TIME), "content did not end in time", () => {
 						return mode === "replay" ?
 							contentWaiter.promise :
-							evaluateScenarioByPuppeteer(page, playlogJsonPath, (s: Screenshot) => {
-								contentOutputReceiver.onScreenshot.fire(s);
-							});
+							evaluateScenarioByPuppeteer(
+								page,
+								playlogJsonPath,
+								path.resolve(contentDirPath, "game.json"),
+								(s: Screenshot) => {
+									contentOutputReceiver.onScreenshot.fire(s);
+								}
+							);
 					});
 					contentOutputReceiver.onScreenshot.removeAll();
 					contentOutputReceiver.onFinish.removeAll();

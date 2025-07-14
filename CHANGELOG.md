@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Unreleased changes
+
+* akashic sandbox 環境で、passive モードのコンテンツのスクリーンショット画像の撮影領域がずれている問題の修正
+
 ## 3.3.28
 
 * akashic sandbox 環境で、passiveモードのv3コンテンツが動作しなくなる不具合の修正
