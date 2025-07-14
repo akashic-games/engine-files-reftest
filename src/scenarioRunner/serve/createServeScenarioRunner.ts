@@ -92,19 +92,20 @@ export async function createServeScenarioRunner(binSrc: TargetBinarySource): Pro
 					}
 				}
 			} catch (e) {
+				// TODO: この辺りのエラーハンドリングは他のScenarioRunnerとほぼ同じコードになっているので、「シナリオを実行してエラー時にスクリーンショットを撮る」一連の流れを共通化すべき
 				if (e instanceof TimeoutError) {
-					const timeoutImage: Screenshot = {
+					const screenshot: Screenshot = {
 						fileName: `timeout_try${playCount}_${extractDirname(scenarioPath)}.png`,
 						base64: await page.screenshot({ encoding: "base64" })
 					};
-					return { status: "timeout", timeoutImage };
+					return { status: "timeout", screenshot };
 				} else {
 					if (page && !page.isClosed()) {
-						const errorScreenshot: Screenshot = {
+						const screenshot: Screenshot = {
 							fileName: `error_try${playCount}_${extractDirname(scenarioPath)}.png`,
 							base64: await page.screenshot({ encoding: "base64" })
 						};
-						return { status: "error", errorScreenshot, error: e };
+						return { status: "error", screenshot, error: e };
 					}
 					throw e;
 				}

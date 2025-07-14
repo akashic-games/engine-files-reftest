@@ -11,11 +11,11 @@ interface ReftestOutputSkipped {
 }
 interface ReftestOutputTimeout {
 	status: "timeout";
-	timeoutImage: Screenshot;
+	screenshot: Screenshot;
 }
 interface ReftestOutputError {
 	status: "error";
-	errorScreenshot: Screenshot;
+	screenshot: Screenshot;
 	error: any;
 }
 

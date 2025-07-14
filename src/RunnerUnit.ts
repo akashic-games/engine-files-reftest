@@ -21,11 +21,18 @@ export class RunnerUnit {
 	protected scenarioRunner: ScenarioRunner;
 	protected preprocessor: Preprocessor | null;
 	protected audioExtractor: AudioExtractor | null;
+	private readonly testType: TestType;
 
-	constructor(scenarioRunner: ScenarioRunner, preprocessor: Preprocessor | null, audioExtractor: AudioExtractor | null) {
+	constructor(
+		scenarioRunner: ScenarioRunner,
+		preprocessor: Preprocessor | null,
+		audioExtractor: AudioExtractor | null,
+		testType: TestType
+	) {
 		this.scenarioRunner = scenarioRunner;
 		this.preprocessor = preprocessor;
 		this.audioExtractor = audioExtractor;
+		this.testType = testType;
 	}
 
 	async run(entry: NormalizedReftestEntry): Promise<ReftestOutput> {
@@ -56,6 +63,10 @@ export class RunnerUnit {
 				entry.executionMode
 			);
 			ret.screenshots.push(additional);
+		} else if (ret.status === "timeout" || ret.status === "error") {
+			// どのtestTypeで失敗したか分かるようなファイル名にする
+			// TODO: ファイル名を後から変更すべきではない。そもそもfiliNameはScreenshotが持つのではなく、ファイル書き出し時に初めて決まるべき
+			ret.screenshot.fileName = `${this.testType}_${ret.screenshot.fileName}`;
 		}
 		// 一時的に用意したcontentDirPathは以降不要になるのでここで削除する
 		// TODO: tmpファイルを削除するオプションを用意して、そのオプションが指定された時のみ削除するように
@@ -151,5 +162,5 @@ async function getRunnerUnit(param: GetRunnerUnitParameterObject): Promise<Runne
 		default:
 			throw new Error("Please specify --test-type <type>. <type> is serve, export-zip, export-html, android, or all.");
 	}
-	return new RunnerUnit(scenarioRunner, preprocessor, audioExtractor);
+	return new RunnerUnit(scenarioRunner, preprocessor, audioExtractor, param.testType);
 }

@@ -78,13 +78,14 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 					appActivity: param.appActivity ?? undefined
 				}
 			});
+			let playCount = 0;
 			try {
 				if (mode === "replay") {
 					const modeButton = await client.$("id:active");
 					await assertDisplayed(modeButton, "mode button(id:active) is not displayed");
 					await modeButton.click();
 				}
-				for (let playCount = 0; playCount < playTimes; playCount++) {
+				for (; playCount < playTimes; playCount++) {
 					const contentWaiter = createWaiter();
 					contentOutputReceiver.onScreenshot.add(s => {
 						screenshots.push({
@@ -126,11 +127,12 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 				}
 			} catch (e) {
 				// エラーが発生した場合は、コンテンツのスクリーンショットを取得しておく
-				const errorScreenshot: Screenshot = {
-					fileName: `error_try${screenshots.length}_${extractDirname(scenarioPath)}.png`,
+				// TODO: この辺りのエラーハンドリングは他のScenarioRunnerとほぼ同じコードになっているので、「シナリオを実行してエラー時にスクリーンショットを撮る」一連の流れを共通化すべき
+				const screenshot: Screenshot = {
+					fileName: `error_try${playCount}_${extractDirname(scenarioPath)}.png`,
 					base64: await client.takeScreenshot()
 				};
-				return { status: "error", errorScreenshot, error: e };
+				return { status: "error", screenshot, error: e };
 			} finally {
 				await client.deleteSession();
 				await serveProcess.stop();

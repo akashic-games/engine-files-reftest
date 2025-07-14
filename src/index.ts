@@ -112,68 +112,67 @@ void (async () => {
 					const expectedDir = path.resolve(reftestEntry.expectedDirPath, testType);
 					console.log(`finish a runnerUnit (testType : ${testType})`);
 					if (mode === "update-expected" || mode === "update-expected-only-diff") {
-						if (output.status === "timeout") {
-							if (timeoutErrorDirPath) {
-								output.timeoutImage.fileName = `${testType}_${output.timeoutImage.fileName}`;
-								outputScreenshots([output.timeoutImage], timeoutErrorDirPath);
-							}
-							throw new Error("Timeout Error");
-						} else if (output.status === "error") {
-							if (errorScreenshotDirPath) {
-								output.errorScreenshot.fileName = `${testType}_${output.errorScreenshot.fileName}`;
-								outputScreenshots([output.errorScreenshot], errorScreenshotDirPath);
-							}
-							throw output.error;
-						}
-						if (fs.existsSync(expectedDir)) {
-							fs.rmdirSync(expectedDir, { recursive: true }); // 前回のテスト結果が残っていたら消す
-						}
-						outputScreenshots(output.screenshots, expectedDir);
-						// lastConfigureHashPath に現在実行した設定のハッシュ値を保存しておく
-						if (!fs.existsSync(lastConfigureHashPath)) {
-							fs.mkdirSync(configureHashPath, { recursive: true });
-						}
-						fs.writeFile(lastConfigureHashPath, configureHash, "utf8",
-							(err) => {
-								if (err) {
-									console.error("failed to save hashed last configure file.", err);
-								} else {
-									console.log("succeeded to save hashed last configure file.");
+						switch (output.status) {
+							case "error":
+								outputErrorScreenshot(output.screenshot, errorScreenshotDirPath);
+								throw output.error;
+							case "timeout":
+								outputErrorScreenshot(output.screenshot, timeoutErrorDirPath);
+								throw new Error(`Timeout Error on "${reftestEntry.selfPath}"`);
+							default:
+								if (fs.existsSync(expectedDir)) {
+									fs.rmdirSync(expectedDir, { recursive: true }); // 前回のテスト結果が残っていたら消す
 								}
-							});
+								outputScreenshots(output.screenshots, expectedDir);
+								// lastConfigureHashPath に現在実行した設定のハッシュ値を保存しておく
+								if (!fs.existsSync(lastConfigureHashPath)) {
+									fs.mkdirSync(configureHashPath, { recursive: true });
+								}
+								fs.writeFile(lastConfigureHashPath, configureHash, "utf8",
+									(err) => {
+										if (err) {
+											console.error("failed to save hashed last configure file.", err);
+										} else {
+											console.log("succeeded to save hashed last configure file.");
+										}
+									}
+								);
+								break;
+						}
 					} else {
 						const reftestEntryPath = path.relative(reftestEntryRootDirPath, reftestEntry.selfPath);
 						const outputDir = path.join(os.tmpdir(), reftestEntryPath, testType, Date.now().toString());
 						let diffs: FileDiff[] = [];
 						let errors: FileDiff[] = [];
 						let timeoutImagePath = "";
-						if (output.status !== "timeout" && output.status !== "error") {
-							outputScreenshots(output.screenshots, outputDir);
-							diffs = output.status === "skipped-unsupported" ? [] : diffDirectory(expectedDir, outputDir);
-							errors = diffs.filter(d => {
-								// 音声の出力タイミングを制御できない且つ毎回音量等にブレが生じるため、音声の波形画像については他のスクリーンショットとは別の閾値を設ける
-								if (path.basename(d.targetPath) === AUDIO_IMAGE_FILE_NAME) {
-									return d.difference > THRESHOLD_FOR_AUDIO_IMAGE;
-								} else {
-									return d.difference > imageDiffThreshold;
+						switch (output.status) {
+							case "error":
+								outputErrorScreenshot(output.screenshot, errorScreenshotDirPath);
+								throw output.error;
+							case "timeout":
+								if (timeoutErrorDirPath) {
+									timeoutImagePath = path.join(timeoutErrorDirPath, output.screenshot.fileName);
 								}
-							});
-							if (diffDirBasePath) {
-								outputDiffImages(diffs, path.join(diffDirBasePath, reftestEntryPath, testType));
-							}
-							if (errorDiffDirBasePath) {
-								outputDiffImages(errors, path.join(errorDiffDirBasePath, reftestEntryPath, testType));
-							}
-						} else if (output.status === "timeout" && timeoutErrorDirPath) {
-							output.timeoutImage.fileName = `${testType}_${output.timeoutImage.fileName}`;
-							outputScreenshots([output.timeoutImage], timeoutErrorDirPath);
-							timeoutImagePath = path.join(timeoutErrorDirPath, output.timeoutImage.fileName);
-						} else if (output.status === "error") {
-							if (errorScreenshotDirPath) {
-								output.errorScreenshot.fileName = `${testType}_${output.errorScreenshot.fileName}`;
-								outputScreenshots([output.errorScreenshot], errorScreenshotDirPath);
-							}
-							throw output.error;
+								outputErrorScreenshot(output.screenshot, timeoutErrorDirPath);
+								break;
+							default:
+								outputScreenshots(output.screenshots, outputDir);
+								diffs = output.status === "skipped-unsupported" ? [] : diffDirectory(expectedDir, outputDir);
+								errors = diffs.filter(d => {
+									// 音声の出力タイミングを制御できない且つ毎回音量等にブレが生じるため、音声の波形画像については他のスクリーンショットとは別の閾値を設ける
+									if (path.basename(d.targetPath) === AUDIO_IMAGE_FILE_NAME) {
+										return d.difference > THRESHOLD_FOR_AUDIO_IMAGE;
+									} else {
+										return d.difference > imageDiffThreshold;
+									}
+								});
+								if (diffDirBasePath) {
+									outputDiffImages(diffs, path.join(diffDirBasePath, reftestEntryPath, testType));
+								}
+								if (errorDiffDirBasePath) {
+									outputDiffImages(errors, path.join(errorDiffDirBasePath, reftestEntryPath, testType));
+								}
+								break;
 						}
 
 						reftestResultMap[testType][reftestEntryPath] = {
@@ -261,4 +260,10 @@ function outputDiffImages(fileDiffs: FileDiff[], outputDir: string): void {
 	fileDiffs.forEach(diff => {
 		fs.writeFileSync(path.join(outputDir, path.basename(diff.targetPath)), diff.content);
 	});
+}
+
+function outputErrorScreenshot(screenshot: Screenshot, outputDir: string | null): void {
+	if (outputDir) {
+		outputScreenshots([screenshot], outputDir);
+	}
 }
