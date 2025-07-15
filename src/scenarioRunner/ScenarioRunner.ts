@@ -20,6 +20,7 @@ interface ReftestOutputError {
 }
 
 export type ReftestOutput = ReftestOutputSucceeded | ReftestOutputSkipped | ReftestOutputTimeout | ReftestOutputError;
+export type ReftestOutputWithScreenshots = ReftestOutputSucceeded | ReftestOutputSkipped;
 
 export interface ScenarioRunner {
 	/**

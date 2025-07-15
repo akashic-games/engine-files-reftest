@@ -21,6 +21,7 @@ import type { FileDiff } from "./util/FileDiff";
 import { initializeNpmDir } from "./util/initializeNpmDir";
 import { mkdirpSync } from "./util/mkdirpSync";
 import { resolveRootDirPath } from "./util/resolveRootDirPath";
+import { ReftestOutputWithScreenshots } from "./scenarioRunner/ScenarioRunner";
 
 const ver = JSON.parse(fs.readFileSync(path.resolve(__dirname, "..", "package.json"), "utf8")).version;
 
@@ -111,70 +112,68 @@ void (async () => {
 					const output = await runnerUnit.run(reftestEntry);
 					const expectedDir = path.resolve(reftestEntry.expectedDirPath, testType);
 					console.log(`finish a runnerUnit (testType : ${testType})`);
-					if (mode === "update-expected" || mode === "update-expected-only-diff") {
-						switch (output.status) {
-							case "error":
-								outputErrorScreenshot(output.screenshot, errorScreenshotDirPath);
-								throw output.error;
-							case "timeout":
-								outputErrorScreenshot(output.screenshot, timeoutErrorDirPath);
+					// テスト結果の出力前にエラーやタイムアウトの処理を行う
+					switch (output.status) {
+						case "error":
+							if (errorScreenshotDirPath) {
+								outputScreenshots([output.screenshot], errorScreenshotDirPath);
+							}
+							throw output.error;
+						case "timeout":
+							if (timeoutErrorDirPath) {
+								outputScreenshots([output.screenshot], timeoutErrorDirPath);
+							}
+							if (mode === "update-expected" || mode === "update-expected-only-diff") {
 								throw new Error(`Timeout Error on "${reftestEntry.selfPath}"`);
-							default:
-								if (fs.existsSync(expectedDir)) {
-									fs.rmdirSync(expectedDir, { recursive: true }); // 前回のテスト結果が残っていたら消す
-								}
-								outputScreenshots(output.screenshots, expectedDir);
-								// lastConfigureHashPath に現在実行した設定のハッシュ値を保存しておく
-								if (!fs.existsSync(lastConfigureHashPath)) {
-									fs.mkdirSync(configureHashPath, { recursive: true });
-								}
-								fs.writeFile(lastConfigureHashPath, configureHash, "utf8",
-									(err) => {
-										if (err) {
-											console.error("failed to save hashed last configure file.", err);
-										} else {
-											console.log("succeeded to save hashed last configure file.");
-										}
-									}
-								);
-								break;
+							}
+						break;
+					}
+					if (mode === "update-expected" || mode === "update-expected-only-diff") {
+						if (fs.existsSync(expectedDir)) {
+							fs.rmdirSync(expectedDir, { recursive: true }); // 前回のテスト結果が残っていたら消す
 						}
+						// 上記のエラー処理でoutputの型がReftestOutputWithScreenshotsであることは保証されている
+						outputScreenshots((output as ReftestOutputWithScreenshots).screenshots, expectedDir);
+						// lastConfigureHashPath に現在実行した設定のハッシュ値を保存しておく
+						if (!fs.existsSync(lastConfigureHashPath)) {
+							fs.mkdirSync(configureHashPath, { recursive: true });
+						}
+						fs.writeFile(lastConfigureHashPath, configureHash, "utf8",
+							(err) => {
+								if (err) {
+									console.error("failed to save hashed last configure file.", err);
+								} else {
+									console.log("succeeded to save hashed last configure file.");
+								}
+							}
+						);
 					} else {
 						const reftestEntryPath = path.relative(reftestEntryRootDirPath, reftestEntry.selfPath);
 						const outputDir = path.join(os.tmpdir(), reftestEntryPath, testType, Date.now().toString());
 						let diffs: FileDiff[] = [];
 						let errors: FileDiff[] = [];
 						let timeoutImagePath = "";
-						switch (output.status) {
-							case "error":
-								outputErrorScreenshot(output.screenshot, errorScreenshotDirPath);
-								throw output.error;
-							case "timeout":
-								if (timeoutErrorDirPath) {
-									timeoutImagePath = path.join(timeoutErrorDirPath, output.screenshot.fileName);
+						if (output.status === "timeout" && timeoutErrorDirPath) {
+							timeoutImagePath = path.join(timeoutErrorDirPath, output.screenshot.fileName);
+						} else {
+							// 上記のエラー処理でoutputの型がReftestOutputWithScreenshotsであることは保証されている
+							outputScreenshots((output as ReftestOutputWithScreenshots).screenshots, outputDir);
+							diffs = output.status === "skipped-unsupported" ? [] : diffDirectory(expectedDir, outputDir);
+							errors = diffs.filter(d => {
+								// 音声の出力タイミングを制御できない且つ毎回音量等にブレが生じるため、音声の波形画像については他のスクリーンショットとは別の閾値を設ける
+								if (path.basename(d.targetPath) === AUDIO_IMAGE_FILE_NAME) {
+									return d.difference > THRESHOLD_FOR_AUDIO_IMAGE;
+								} else {
+									return d.difference > imageDiffThreshold;
 								}
-								outputErrorScreenshot(output.screenshot, timeoutErrorDirPath);
-								break;
-							default:
-								outputScreenshots(output.screenshots, outputDir);
-								diffs = output.status === "skipped-unsupported" ? [] : diffDirectory(expectedDir, outputDir);
-								errors = diffs.filter(d => {
-									// 音声の出力タイミングを制御できない且つ毎回音量等にブレが生じるため、音声の波形画像については他のスクリーンショットとは別の閾値を設ける
-									if (path.basename(d.targetPath) === AUDIO_IMAGE_FILE_NAME) {
-										return d.difference > THRESHOLD_FOR_AUDIO_IMAGE;
-									} else {
-										return d.difference > imageDiffThreshold;
-									}
-								});
-								if (diffDirBasePath) {
-									outputDiffImages(diffs, path.join(diffDirBasePath, reftestEntryPath, testType));
-								}
-								if (errorDiffDirBasePath) {
-									outputDiffImages(errors, path.join(errorDiffDirBasePath, reftestEntryPath, testType));
-								}
-								break;
+							});
+							if (diffDirBasePath) {
+								outputDiffImages(diffs, path.join(diffDirBasePath, reftestEntryPath, testType));
+							}
+							if (errorDiffDirBasePath) {
+								outputDiffImages(errors, path.join(errorDiffDirBasePath, reftestEntryPath, testType));
+							}
 						}
-
 						reftestResultMap[testType][reftestEntryPath] = {
 							fileDiffs: diffs,
 							status: (output.status === "skipped-unsupported") ? "skipped" :
@@ -260,10 +259,4 @@ function outputDiffImages(fileDiffs: FileDiff[], outputDir: string): void {
 	fileDiffs.forEach(diff => {
 		fs.writeFileSync(path.join(outputDir, path.basename(diff.targetPath)), diff.content);
 	});
-}
-
-function outputErrorScreenshot(screenshot: Screenshot, outputDir: string | null): void {
-	if (outputDir) {
-		outputScreenshots([screenshot], outputDir);
-	}
 }
