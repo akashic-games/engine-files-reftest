@@ -13,7 +13,7 @@ export async function evaluateScenarioByPuppeteer(
 ): Promise<void> {
 	if (gameJsonPath) {
 		// game.jsonの動的読み込みのため、require の lint エラーを抑止
-		/* eslint-disable @typescript-eslint/no-require-imports */
+		// eslint-disable-next-line @typescript-eslint/no-require-imports
 		const gameJson = require(gameJsonPath);
 		// コンテンツ描画領域が他の要素と重ならないようにするために、画面サイズをコンテンツのサイズよりも大きくする
 		await page.setViewport({ width: Math.round(1.1 * gameJson.width), height: Math.round(1.1 * gameJson.height) });
@@ -60,7 +60,7 @@ export async function evaluateScenarioByAppium(
 	// TODO: ゲームコンテンツの縦横比によってコンテンツの表示位置が変わるので対応できるようにする必要がある、またコンテンツは拡縮されているため座標もその拡縮に合わせる必要がある
 	const gameViewRect = await gameView.getWindowRect();
 	// game.jsonの動的読み込みのため、require の lint エラーを抑止
-	/* eslint-disable @typescript-eslint/no-require-imports */
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
 	const gameJson = require(gameJsonPath);
 	const gameSizeRate = gameViewRect.width / gameJson.width;
 	await evaluateScenario(

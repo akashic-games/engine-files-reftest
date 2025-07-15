@@ -2,7 +2,7 @@
 
 ## Unreleased changes
 
-* akashic sandbox 環境で、passive モードのコンテンツのスクリーンショット画像の撮影領域がずれている問題の修正
+* akashic serve 環境で、passive モードのコンテンツのスクリーンショット画像の撮影領域がずれている問題の修正
 
 ## 3.3.28
 

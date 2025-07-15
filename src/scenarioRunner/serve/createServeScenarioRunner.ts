@@ -45,7 +45,7 @@ export async function createServeScenarioRunner(binSrc: TargetBinarySource): Pro
 				page.on("console", msg => {
 					console.log("ServeScenarioRunner: ", msg.text().trimEnd());
 				});
-				/* eslint-disable @typescript-eslint/no-require-imports */
+				// eslint-disable-next-line @typescript-eslint/no-require-imports
 				const playlogJson = require(playlogJsonPath);
 				// テスト時間短縮のために、replayモードでserveアクセス時にreplayTargetTimeのクエリパラメータを付与
 				const replayTargetTime = calculateFinishedTime(
