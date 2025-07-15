@@ -7,16 +7,14 @@ import type { Screenshot } from "../types/Screenshot";
 export async function evaluateScenarioByPuppeteer(
 	page: puppeteer.Page,
 	playlogJsonPath: string,
-	gameJsonPath?: string,
 	takeScreenshotFunc?: (s: Screenshot) => void,
-	selector: string = "canvas"
+	selector: string = "canvas",
+	viewport?: { width: number; height: number }
 ): Promise<void> {
-	if (gameJsonPath) {
-		// game.jsonの動的読み込みのため、require の lint エラーを抑止
-		// eslint-disable-next-line @typescript-eslint/no-require-imports
-		const gameJson = require(gameJsonPath);
-		// コンテンツ描画領域が他の要素と重ならないようにするために、画面サイズをコンテンツのサイズよりも大きくする
-		await page.setViewport({ width: Math.round(1.1 * gameJson.width), height: Math.round(1.1 * gameJson.height) });
+	if (viewport) {
+		// コンテンツのサイズに合わせてウィンドウサイズを変更する
+		// 環境によってはウィンドウサイズが小さいとスクリーンショット撮影領域が変わるだけでなく、縮尺まで変わってしまう。縮尺が変わる原因については不明。
+		await page.setViewport({ width: viewport.width, height: viewport.height });
 	}
 	await page.waitForSelector(selector);
 	// canvas 要素が存在する環境で実行する前提なので、! を付与する
