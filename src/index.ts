@@ -11,6 +11,7 @@ import { normalizeReftestEntry } from "./configure/ReftestEntry";
 import { renderHtmlReport } from "./outputResult/renderHtmlReport";
 import { renderHtmlReportIndex } from "./outputResult/renderHtmlReportIndex";
 import { withRunnerUnit } from "./RunnerUnit";
+import type { ReftestOutputWithScreenshots } from "./scenarioRunner/ScenarioRunner";
 import type { ReftestMode } from "./types/ReftestMode";
 import type { ReftestResult } from "./types/ReftestResult";
 import type { Screenshot } from "./types/Screenshot";
@@ -21,7 +22,6 @@ import type { FileDiff } from "./util/FileDiff";
 import { initializeNpmDir } from "./util/initializeNpmDir";
 import { mkdirpSync } from "./util/mkdirpSync";
 import { resolveRootDirPath } from "./util/resolveRootDirPath";
-import { ReftestOutputWithScreenshots } from "./scenarioRunner/ScenarioRunner";
 
 const ver = JSON.parse(fs.readFileSync(path.resolve(__dirname, "..", "package.json"), "utf8")).version;
 
@@ -126,7 +126,7 @@ void (async () => {
 							if (mode === "update-expected" || mode === "update-expected-only-diff") {
 								throw new Error(`Timeout Error on "${reftestEntry.selfPath}"`);
 							}
-						break;
+							break;
 					}
 					if (mode === "update-expected" || mode === "update-expected-only-diff") {
 						if (fs.existsSync(expectedDir)) {
