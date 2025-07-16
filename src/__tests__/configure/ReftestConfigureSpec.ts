@@ -1,3 +1,4 @@
+import * as os from "os";
 import * as path from "path";
 import type { ReftestCommandOption} from "../../configure/ReftestConfigure";
 import { createReftestConfigure, resolveTestTypes } from "../../configure/ReftestConfigure";
@@ -6,48 +7,50 @@ describe("ReftestConfigure", () => {
 	describe("createReftestConfigure", () => {
 		test("設定ファイルの指定が無い場合デフォルト値が返ってくる", () => {
 			const result = createReftestConfigure({});
-			expect(result).toEqual({
-				testType: null,
-				targets: [],
-				update: false,
-				updateDiff: false,
-				sandboxVer: null,
-				serveVer: null,
-				sandboxPath: null,
-				servePath: null,
-				exportHtmlPath: null,
-				exportZipPath: null,
-				diffDirPath: null,
-				errorDiffDirPath: null,
-				threshold: 0,
-				android: null,
-				outputHtml: null,
-				timeoutErrorDirPath: null,
-				useNpmCache: false,
-				npmCacheDir: path.resolve(".", "__bincache")
-			});
+			expect(result.testType).toBeNull();
+			expect(result.targets).toEqual([]);
+			expect(result.update).toBeFalsy();
+			expect(result.updateDiff).toBeFalsy();
+			expect(result.sandboxVer).toBeNull();
+			expect(result.serveVer).toBeNull();
+			expect(result.sandboxPath).toBeNull();
+			expect(result.servePath).toBeNull();
+			expect(result.exportHtmlPath).toBeNull();
+			expect(result.exportZipPath).toBeNull();
+			expect(result.diffDirPath).toBeNull();
+			expect(result.errorDiffDirPath).toBeNull();
+			expect(result.threshold).toBe(0);
+			expect(result.android).toBeNull();
+			expect(result.outputHtml).toBeNull();
+			expect(result.timeoutErrorDirPath).toBeNull();
+			expect(result.useNpmCache).toBeFalsy();
+			expect(result.npmCacheDir.indexOf(path.join(os.tmpdir(), "_reftest")) !== -1).toBeTruthy();
+		});
+
+		test("useNpmCache が真の時、npmCacheDir がキャッシュ用のディレクトリとなる", () => {
+			const result = createReftestConfigure({ useNpmCache: true });
+			expect(result.useNpmCache).toBeTruthy();
+			expect(result.npmCacheDir).toBe(path.resolve(".", "__bincache"));
 		});
 		test("設定ファイルの指定がある場合は設定ファイルで指定した値が返ってくる", () => {
 			const result = createReftestConfigure({ configure: path.resolve(__dirname, "../fixture/reftest.config.json") });
-			expect(result).toEqual({
-				testType: "serve",
-				targets: [path.resolve(__dirname, "../fixture/sample1/reftest.entry.json")],
-				update: false,
-				updateDiff: false,
-				sandboxVer: null,
-				serveVer: null,
-				sandboxPath: null,
-				servePath: null,
-				exportHtmlPath: null,
-				exportZipPath: null,
-				diffDirPath: null,
-				errorDiffDirPath: null,
-				threshold: 0,
-				outputHtml: null,
-				timeoutErrorDirPath: null,
-				useNpmCache: false,
-				npmCacheDir: path.resolve(path.resolve(__dirname, "../fixture"), "__bincache")
-			});
+			expect(result.testType).toBe("serve");
+			expect(result.targets).toEqual([path.resolve(__dirname, "../fixture/sample1/reftest.entry.json")]);
+			expect(result.update).toBeFalsy();
+			expect(result.updateDiff).toBeFalsy();
+			expect(result.sandboxVer).toBeNull();
+			expect(result.serveVer).toBeNull();
+			expect(result.sandboxPath).toBeNull();
+			expect(result.servePath).toBeNull();
+			expect(result.exportHtmlPath).toBeNull();
+			expect(result.exportZipPath).toBeNull();
+			expect(result.diffDirPath).toBeNull();
+			expect(result.errorDiffDirPath).toBeNull();
+			expect(result.threshold).toBe(0);
+			expect(result.outputHtml).toBeNull();
+			expect(result.timeoutErrorDirPath).toBeNull();
+			expect(result.useNpmCache).toBeFalsy();
+			expect(result.npmCacheDir.indexOf(path.join(os.tmpdir(), "_reftest")) !== -1).toBeTruthy();
 		});
 		test("設定ファイルとその他オプションの指定がある場合はオプションで指定した値が優先される", () => {
 			const option: ReftestCommandOption = {
@@ -63,35 +66,33 @@ describe("ReftestConfigure", () => {
 				androidAppPackage: ".Example"
 			};
 			const result = createReftestConfigure(option);
-			expect(result).toEqual({
-				testType: "all",
-				targets: [
-					path.resolve(__dirname, "../fixture/sample1/reftest.entry.json"),
-					path.resolve(__dirname, "../fixture/**/reftest.entry.js")
-				],
-				update: true,
-				updateDiff: false,
-				sandboxVer: null,
-				serveVer: null,
-				sandboxPath: null,
-				servePath: null,
-				exportHtmlPath: null,
-				exportZipPath: null,
-				diffDirPath: null,
-				errorDiffDirPath: null,
-				threshold: 0.03,
-				outputHtml: null,
-				timeoutErrorDirPath: null,
-				useNpmCache: false,
-				npmCacheDir: path.resolve(path.resolve(__dirname, "../fixture"), "__bincache"),
-				android: {
-					apkPath: path.resolve("/tmp/test.apk"),
-					emulator: null,
-					playlogClientPath: path.resolve("/tmp/palylogClient.js"),
-					appActivity: "example.test",
-					appPackage: ".Example"
-				}
+			expect(result.testType).toBe("all");
+			expect(result.targets).toEqual([
+				path.resolve(__dirname, "../fixture/sample1/reftest.entry.json"),
+				path.resolve(__dirname, "../fixture/**/reftest.entry.js")
+			]);
+			expect(result.update).toBeTruthy();
+			expect(result.updateDiff).toBeFalsy();
+			expect(result.sandboxVer).toBeNull();
+			expect(result.serveVer).toBeNull();
+			expect(result.sandboxPath).toBeNull();
+			expect(result.servePath).toBeNull();
+			expect(result.exportHtmlPath).toBeNull();
+			expect(result.exportZipPath).toBeNull();
+			expect(result.diffDirPath).toBeNull();
+			expect(result.errorDiffDirPath).toBeNull();
+			expect(result.threshold).toBe(0.03);
+			expect(result.android).toEqual({
+				apkPath: path.resolve("/tmp/test.apk"),
+				emulator: null,
+				playlogClientPath: path.resolve("/tmp/palylogClient.js"),
+				appActivity: "example.test",
+				appPackage: ".Example"
 			});
+			expect(result.outputHtml).toBeNull();
+			expect(result.timeoutErrorDirPath).toBeNull();
+			expect(result.useNpmCache).toBeFalsy();
+			expect(result.npmCacheDir.indexOf(path.join(os.tmpdir(), "_reftest")) !== -1).toBeTruthy();
 		});
 		test("設定ファイルが存在しない場合はエラーになる", (done) => {
 			const notExistConfigPath = path.resolve(__dirname, "../fixture/notexist.config.json");
