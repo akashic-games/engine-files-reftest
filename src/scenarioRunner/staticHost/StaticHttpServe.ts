@@ -42,6 +42,9 @@ export class StaticHttpServe implements StaticHost {
 	getVersionInfo(): string {
 		return "http-server";
 	}
+	dispose(): void {
+		// do nothing
+	}
 }
 
 export async function createStaticHttpServe(): Promise<StaticHttpServe> {

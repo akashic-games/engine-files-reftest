@@ -98,22 +98,36 @@ async function getRunnerUnit(param: GetRunnerUnitParameterObject): Promise<Runne
 	let preprocessor: Preprocessor | null = null;
 	let audioExtractor: AudioExtractor | null = null;
 
+	const versionLatest = "latest";
+	let serveVer = versionLatest;
+	if (param.configure.serveVer && param.configure.servePath == null) {
+		serveVer = param.configure.serveVer;
+	}
 	// npmCacheDir にはデフォルトパスがあるので、nullにはならない想定
-	const downloadDirPath = path.resolve(param.configure.npmCacheDir);
+	const downloadDirPath = path.join(path.resolve(param.configure.npmCacheDir), "serve", serveVer);
 	const serveBinSrc: TargetBinarySource = param.configure.servePath ?
 		{ type: "local", path: path.resolve(param.configure.servePath) } :
-		{ type: "published", downloadDirPath: downloadDirPath };
-	if (param.configure.serveVer && serveBinSrc.type === "published") {
-		serveBinSrc.version = param.configure.serveVer;
-	}
+		{
+			type: "published",
+			downloadDirPath: downloadDirPath,
+			useNpmCache: param.configure.useNpmCache,
+			version: serveVer
+		};
 	switch (param.testType) {
 		case "sandbox":
+			let sandboxVer = versionLatest;
+			if (param.configure.sandboxVer && param.configure.sandboxPath == null) {
+				sandboxVer = param.configure.sandboxVer;
+			}
+			const sandboxDownloadDirPath = path.join(path.resolve(param.configure.npmCacheDir), "sandbox", sandboxVer);
 			const sandboxBinSrc: TargetBinarySource = param.configure.sandboxPath ?
 				{ type: "local", path: path.resolve(param.configure.sandboxPath) } :
-				{ type: "published", downloadDirPath: downloadDirPath };
-			if (param.configure.sandboxVer && sandboxBinSrc.type === "published") {
-				sandboxBinSrc.version = param.configure.sandboxVer;
-			}
+				{
+					type: "published",
+					downloadDirPath: sandboxDownloadDirPath,
+					useNpmCache: param.configure.useNpmCache,
+					version: sandboxVer
+				};
 			scenarioRunner = await createStaticHostScenarioRunner(await createAkashicSandbox(sandboxBinSrc));
 			break;
 		case "serve":
@@ -121,16 +135,28 @@ async function getRunnerUnit(param: GetRunnerUnitParameterObject): Promise<Runne
 			audioExtractor = await createServeAudioExtractor(serveBinSrc);
 			break;
 		case "export-zip":
+			const exportZipDownloadDirPath = path.join(path.resolve(param.configure.npmCacheDir), "export-zip", "latest");
 			const exportZipBinarySource: TargetBinarySource = param.configure.exportZipPath ?
 				{ type: "local", path: path.resolve(param.configure.exportZipPath) } :
-				{ type: "published", downloadDirPath: downloadDirPath };
+				{
+					type: "published",
+					downloadDirPath: exportZipDownloadDirPath,
+					useNpmCache:  param.configure.useNpmCache,
+					version: versionLatest
+				};
 			preprocessor = await createExportZipPreprocessor(exportZipBinarySource);
 			scenarioRunner = await createServeScenarioRunner(serveBinSrc);
 			break;
 		case "export-html":
+			const exportHtmlDownloadDirPath = path.join(path.resolve(param.configure.npmCacheDir), "export-html", "latest");
 			const exportHtmlBinarySource: TargetBinarySource = param.configure.exportHtmlPath ?
 				{ type: "local", path: path.resolve(param.configure.exportHtmlPath) } :
-				{ type: "published", downloadDirPath: downloadDirPath };
+				{
+					type: "published",
+					downloadDirPath: exportHtmlDownloadDirPath,
+					useNpmCache:  param.configure.useNpmCache,
+					version: versionLatest
+				};
 			preprocessor = await createExportHtmlPreprocessor(exportHtmlBinarySource);
 			scenarioRunner = await createStaticHostScenarioRunner(new StaticHttpServe());
 			break;

@@ -9,6 +9,7 @@ export type TargetBinarySourcePublished = {
 	type: "published";
 	downloadDirPath: string;
 	version?: string;
+	useNpmCache?: boolean;
 };
 
 export type TargetBinarySource = TargetBinarySourceLocal | TargetBinarySourcePublished;

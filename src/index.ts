@@ -16,9 +16,7 @@ import type { ReftestResult } from "./types/ReftestResult";
 import type { Screenshot } from "./types/Screenshot";
 import { createConfigureHash } from "./util/createConfigureHash";
 import { diffDirectory } from "./util/diffDirectory";
-import { existCaches } from "./util/existCaches";
 import type { FileDiff } from "./util/FileDiff";
-import { initializeNpmDir } from "./util/initializeNpmDir";
 import { mkdirpSync } from "./util/mkdirpSync";
 import { resolveRootDirPath } from "./util/resolveRootDirPath";
 
@@ -84,10 +82,6 @@ void (async () => {
 		if (configure.outputHtml) {
 			htmlReportDir = path.resolve(configure.outputHtml);
 			mkdirpSync(htmlReportDir);
-		}
-		// バイナリのキャッシュを使用しない、または、使用するキャッシュが存在しない場合、キャッシュを初期化
-		if (!configure.useNpmCache || !existCaches(configure, targetTestTypes)) {
-			initializeNpmDir(configure);
 		}
 
 		for (const testType of targetTestTypes) {

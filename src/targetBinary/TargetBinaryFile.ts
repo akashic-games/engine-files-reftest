@@ -1,5 +1,7 @@
+import * as fs from "fs";
 import * as path from "path";
 import { execCommand } from "../util/execCommand";
+import { initializeNpmDir } from "../util/initializeNpmDir";
 import type { TargetBinaryNameInfo } from "./TargetBinaryNameInfo";
 import type { TargetBinarySource, TargetBinarySourceLocal, TargetBinarySourcePublished } from "./TargetBinarySource";
 
@@ -49,14 +51,24 @@ class PublishedTargetBinaryFile implements TargetBinaryFile {
 		this.path = null!;
 		this.nameInfo = nameInfo;
 		this.binSrc = binSrc;
-		withCwdSync(this.binSrc.downloadDirPath, () => {
-			execCommand(`npm i ${nameInfo.moduleName}@${binSrc.version ?? "latest"}`);
+		const npmCacheDir = binSrc.downloadDirPath;
+		if (!fs.existsSync(npmCacheDir)) {
+			initializeNpmDir(npmCacheDir);
+			withCwdSync(this.binSrc.downloadDirPath, () => {
+				execCommand(`npm i ${nameInfo.moduleName}@${binSrc.version ?? "latest"}`);
+				this.path = path.join(binSrc.downloadDirPath, "node_modules", ".bin", nameInfo.binName);
+			});
+		} else {
 			this.path = path.join(binSrc.downloadDirPath, "node_modules", ".bin", nameInfo.binName);
-		});
+		}
 	}
 
 	dispose(): void {
-		// do nothing
+		if (this.binSrc.type === "published" && !this.binSrc.useNpmCache) {
+			if (fs.existsSync(this.binSrc.downloadDirPath)) {
+				fs.rmdirSync(this.binSrc.downloadDirPath, { recursive: true });
+			}
+		}
 	}
 }
 
