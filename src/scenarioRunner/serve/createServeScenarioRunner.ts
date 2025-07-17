@@ -77,7 +77,7 @@ export async function createServeScenarioRunner(binSrc: TargetBinarySource): Pro
 					// 稀に終了メッセージを流す前にコンテンツが終了することがあるため、コンテンツが確実に終了している時間を経過したら強制的に待機を解除する処理を用意した
 					await withTimeLimit(Math.min(expectedTime, CONTENT_LIMIT_MAX_TIME), "content did not end in time", () => {
 						// コンテンツのサイズをgame.jsonから取得する
-						const gameJson = JSON.parse(fs.readFileSync(path.resolve(contentDirPath, "game.json")).toString());
+						const gameJson = JSON.parse(fs.readFileSync(path.resolve(contentDirPath, "game.json"), "utf-8"));
 						// ウィンドウサイズをコンテンツのサイズとピッタリ同じにすると、ツールバーなどの要素が重なってしまうため、少し余白を持たせる
 						const margin = 100;
 						const viewport = { width: gameJson.width + margin, height: gameJson.height + margin };
