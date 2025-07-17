@@ -112,7 +112,7 @@ describe("RunnerUnit", () => {
 			};
 		});
 		test("passiveモードでPreprocessor無しの場合、指定されたスクリプトが差し込まれたディレクトリに対してScenarioRunnerが実行される", async () => {
-			const runnerUnit = new RunnerUnit(scenarioRunner, null, null, "serve");
+			const runnerUnit = new RunnerUnit(scenarioRunner, null, null);
 			const result = await runnerUnit.run(reftestEntry);
 			// run() の戻り型 `ReftestOutput` の `ReftestOutputTimeout` は screenshots プロパティが存在しないため参照するとエラーとなる。status 判定してビルドを通している。
 			if (result.status !== "succeeded") throw new Error("failed because status is different");
@@ -128,7 +128,7 @@ describe("RunnerUnit", () => {
 			);
 		});
 		test("replayモードでPreprocessor無しの場合、指定されたスクリプトとhelperモジュールが差し込まれたディレクトリに対してScenarioRunnerが実行される", async () => {
-			const runnerUnit = new RunnerUnit(scenarioRunner, null, null, "serve");
+			const runnerUnit = new RunnerUnit(scenarioRunner, null, null);
 			reftestEntry.executionMode = "replay";
 			const result = await runnerUnit.run(reftestEntry);
 			if (result.status !== "succeeded") throw new Error("failed because status is different");
@@ -144,7 +144,7 @@ describe("RunnerUnit", () => {
 			);
 		});
 		test("passiveモードでPreprocessorありの場合、Preprocessorが実行され、指定されたスクリプトが差し込まれたディレクトリに対してScenarioRunnerが実行される", async () => {
-			const runnerUnit = new RunnerUnit(scenarioRunner, preprocessor, null, "export-zip");
+			const runnerUnit = new RunnerUnit(scenarioRunner, preprocessor, null);
 			const result = await runnerUnit.run(reftestEntry);
 			if (result.status !== "succeeded") throw new Error("failed because status is different");
 			expect(injectScripts).toHaveBeenCalledTimes(1);
@@ -160,7 +160,7 @@ describe("RunnerUnit", () => {
 			expect(preprocessor.run).toBeCalled();
 		});
 		test("replayモードでPreprocessorありの場合、Preprocessorが実行され、指定されたスクリプトとhelperモジュールが差し込まれたディレクトリに対してScenarioRunnerが実行される", async () => {
-			const runnerUnit = new RunnerUnit(scenarioRunner, preprocessor, null, "export-zip");
+			const runnerUnit = new RunnerUnit(scenarioRunner, preprocessor, null);
 			reftestEntry.executionMode = "replay";
 			const result = await runnerUnit.run(reftestEntry);
 			if (result.status !== "succeeded") throw new Error("failed because status is different");
@@ -178,7 +178,7 @@ describe("RunnerUnit", () => {
 		});
 		// AudioExtractorの実行は一時的に止めているためテストもスキップ
 		test("AudioExtractorありの場合、ScenarioRunnerと同様のシグニチャでAudioExtractorが実行される", async () => {
-			const runnerUnit = new RunnerUnit(scenarioRunner, null, audioExtractor, "serve");
+			const runnerUnit = new RunnerUnit(scenarioRunner, null, audioExtractor);
 			const result = await runnerUnit.run(reftestEntry);
 			if (result.status !== "succeeded") throw new Error("failed because status is different");
 			expect(injectScripts).toHaveBeenCalledTimes(1);

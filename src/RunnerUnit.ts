@@ -21,18 +21,15 @@ export class RunnerUnit {
 	protected scenarioRunner: ScenarioRunner;
 	protected preprocessor: Preprocessor | null;
 	protected audioExtractor: AudioExtractor | null;
-	private readonly testType: TestType;
 
 	constructor(
 		scenarioRunner: ScenarioRunner,
 		preprocessor: Preprocessor | null,
-		audioExtractor: AudioExtractor | null,
-		testType: TestType
+		audioExtractor: AudioExtractor | null
 	) {
 		this.scenarioRunner = scenarioRunner;
 		this.preprocessor = preprocessor;
 		this.audioExtractor = audioExtractor;
-		this.testType = testType;
 	}
 
 	async run(entry: NormalizedReftestEntry): Promise<ReftestOutput> {
@@ -63,10 +60,6 @@ export class RunnerUnit {
 				entry.executionMode
 			);
 			ret.screenshots.push(additional);
-		} else if (ret.status === "timeout" || ret.status === "error") {
-			// どのtestTypeで失敗したか分かるようなファイル名にする
-			// TODO: ファイル名を後から変更すべきではない。そもそもfiliNameはScreenshotが持つのではなく、ファイル書き出し時に初めて決まるべき
-			ret.screenshot.fileName = `${this.testType}_${ret.screenshot.fileName}`;
 		}
 		// 一時的に用意したcontentDirPathは以降不要になるのでここで削除する
 		// TODO: tmpファイルを削除するオプションを用意して、そのオプションが指定された時のみ削除するように
@@ -125,10 +118,11 @@ async function getRunnerUnit(param: GetRunnerUnitParameterObject): Promise<Runne
 			if (param.configure.sandboxVer && sandboxBinSrc.type === "published") {
 				sandboxBinSrc.version = param.configure.sandboxVer;
 			}
-			scenarioRunner = await createStaticHostScenarioRunner(await createAkashicSandbox(sandboxBinSrc));
+			const sandbox = await createAkashicSandbox(sandboxBinSrc);
+			scenarioRunner = await createStaticHostScenarioRunner({ type: "sandbox", hostBin: sandbox });
 			break;
 		case "serve":
-			scenarioRunner = await createServeScenarioRunner(serveBinSrc);
+			scenarioRunner = await createServeScenarioRunner({ type: "serve", binSrc: serveBinSrc });
 			audioExtractor = await createServeAudioExtractor(serveBinSrc);
 			break;
 		case "export-zip":
@@ -136,14 +130,15 @@ async function getRunnerUnit(param: GetRunnerUnitParameterObject): Promise<Runne
 				{ type: "local", path: path.resolve(param.configure.exportZipPath) } :
 				{ type: "published", downloadDirPath: downloadDirPath };
 			preprocessor = await createExportZipPreprocessor(exportZipBinarySource);
-			scenarioRunner = await createServeScenarioRunner(serveBinSrc);
+			scenarioRunner = await createServeScenarioRunner({ type: "export-zip", binSrc: serveBinSrc });
 			break;
 		case "export-html":
 			const exportHtmlBinarySource: TargetBinarySource = param.configure.exportHtmlPath ?
 				{ type: "local", path: path.resolve(param.configure.exportHtmlPath) } :
 				{ type: "published", downloadDirPath: downloadDirPath };
 			preprocessor = await createExportHtmlPreprocessor(exportHtmlBinarySource);
-			scenarioRunner = await createStaticHostScenarioRunner(new StaticHttpServe());
+			const staticHttpServe = new StaticHttpServe();
+			scenarioRunner = await createStaticHostScenarioRunner({ type: "export-html", hostBin: staticHttpServe });
 			break;
 		case "android":
 			if (!param.configure.android || !param.configure.android.apkPath || !param.configure.android.playlogClientPath) {
@@ -157,10 +152,10 @@ async function getRunnerUnit(param: GetRunnerUnitParameterObject): Promise<Runne
 				appPackage: param.configure.android.appPackage,
 				appActivity: param.configure.android.appActivity
 			};
-			scenarioRunner = await createAndroidScenarioRunner(params);
+			scenarioRunner = await createAndroidScenarioRunner({type: "android", ...params});
 			break;
 		default:
 			throw new Error("Please specify --test-type <type>. <type> is serve, export-zip, export-html, android, or all.");
 	}
-	return new RunnerUnit(scenarioRunner, preprocessor, audioExtractor, param.testType);
+	return new RunnerUnit(scenarioRunner, preprocessor, audioExtractor);
 }

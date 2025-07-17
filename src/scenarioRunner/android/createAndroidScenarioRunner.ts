@@ -19,6 +19,7 @@ const CONTENT_LIMIT_TIME = 300000; // コンテンツ実行時間の上限
 const ANDROID_ELEMENT_TIMEOUT = 10000; // Androidエミュレータの要素取得タイムアウト
 
 interface CreateAndroidScenarioRunnerParameterObject {
+	type: "android";
 	serveBinSrc: TargetBinarySource;
 	apkPath: string;
 	playlogClientPath: string;
@@ -129,7 +130,7 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 				// エラーが発生した場合は、コンテンツのスクリーンショットを取得しておく
 				// TODO: この辺りのエラーハンドリングは他のScenarioRunnerとほぼ同じコードになっているので、「シナリオを実行してエラー時にスクリーンショットを撮る」一連の流れを共通化すべき
 				const screenshot: Screenshot = {
-					fileName: `error_try${playCount}_${extractDirname(scenarioPath)}.png`,
+					fileName: `${param.type}_error_try${playCount}_${extractDirname(scenarioPath)}.png`,
 					base64: await client.takeScreenshot()
 				};
 				return { status: "error", screenshot, error: e };
