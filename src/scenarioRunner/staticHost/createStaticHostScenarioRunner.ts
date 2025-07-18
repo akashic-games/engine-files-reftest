@@ -70,6 +70,9 @@ export async function createStaticHostScenarioRunner(hostBin: StaticHost): Promi
 		dispose: async (): Promise<void> => {
 			hostBin.dispose();
 		},
+		finish: async (): Promise<void> => {
+			hostBin.finish();
+		},
 		getVersionInfo: (): string => {
 			return hostBin.getVersionInfo();
 		}

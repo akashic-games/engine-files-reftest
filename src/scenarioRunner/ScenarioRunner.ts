@@ -37,6 +37,11 @@ export interface ScenarioRunner {
 	dispose(): Promise<void>;
 
 	/**
+	 * 終了通知
+	 */
+	finish(): Promise<void>;
+
+	/**
 	 * 利用しているツールのバージョン情報を取得する。
 	*/
 	getVersionInfo(): string;

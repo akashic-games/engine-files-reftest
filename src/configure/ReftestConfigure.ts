@@ -36,6 +36,7 @@ export interface ReftestCommandOption {
 	timeoutErrorDirPath?: string;
 	useNpmCache?: boolean;
 	npmCacheDirPath?: string;
+	clearCache?: boolean;
 }
 
 export interface AndroidConfigure {
@@ -65,6 +66,7 @@ export interface ReftestConfigure {
 	timeoutErrorDirPath: string | null;
 	useNpmCache: boolean | false;
 	npmCacheDir: string | null;
+	clearCache: boolean | false;
 }
 
 export interface NormalizedReftestConfigure extends ReftestConfigure {
@@ -86,6 +88,8 @@ export interface NormalizedReftestConfigure extends ReftestConfigure {
 	timeoutErrorDirPath: string | null;
 	useNpmCache: boolean;
 	npmCacheDir: string;
+	tempDownlodDir: string;
+	clearCache: boolean;
 }
 
 
@@ -127,6 +131,7 @@ export function createReftestConfigure(option: ReftestCommandOption): Normalized
 			timeoutErrorDirPath: null,
 			useNpmCache: false,
 			npmCacheDir: null,
+			clearCache: false
 		};
 	}
 	const dirPath = configurePath ? path.dirname(configurePath) : ".";
@@ -148,6 +153,7 @@ export function createReftestConfigure(option: ReftestCommandOption): Normalized
 	configure.timeoutErrorDirPath = option.timeoutErrorDirPath ?? resolvePath(dirPath, configure.timeoutErrorDirPath);
 	configure.useNpmCache = option.useNpmCache ?? (configure.useNpmCache ?? false);
 	configure.npmCacheDir = option.npmCacheDirPath ?? null;
+	configure.clearCache = option.clearCache ?? (configure.clearCache ?? false);
 	if (option.androidApkPath || option.androidPlaylogClientPath) {
 		if (!configure.android) {
 			configure.android = {
@@ -165,16 +171,15 @@ export function createReftestConfigure(option: ReftestCommandOption): Normalized
 		configure.android.appActivity = option.androidAppActivity ?? (configure.android.appActivity ?? null);
 	}
 
-	let npmCacheDirPath = resolvePath(dirPath, "__bincache")!; // resolvePath() は第2引数が string なら string を返す
-	if (!configure.npmCacheDir && !configure.useNpmCache) {
-		const tmpPath = fs.mkdtempSync(path.join(os.tmpdir(), "_reftest"));
-		npmCacheDirPath = tmpPath;
+	if (configure.npmCacheDir && !configure.useNpmCache) {
+		configure.useNpmCache = true;
 	}
 
 	const normalizedConfigure: NormalizedReftestConfigure = {
 		...configure,
 		threshold: configure.threshold ?? DEFAULT_IMAGE_DIFF_THRESHOLD,
-		npmCacheDir: configure.npmCacheDir ?? npmCacheDirPath
+		npmCacheDir: configure.npmCacheDir ?? resolvePath(dirPath, "__bincache")!, // resolvePath() は第2引数が string なら string を返す
+		tempDownlodDir: fs.mkdtempSync(path.join(os.tmpdir(), "reftest_"))
 	};
 	return normalizedConfigure;
 }

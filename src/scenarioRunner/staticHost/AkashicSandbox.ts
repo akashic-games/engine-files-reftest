@@ -72,6 +72,10 @@ export class AkashicSandbox implements StaticHost {
 		console.log("finish to uninstall @akashic/akashic-(cli-)sandbox");
 	}
 
+	finish(): void {
+		this._binFile.finish();
+	}
+
 	getVersionInfo(): string {
 		return `sandbox@${this._version}`;
 	}

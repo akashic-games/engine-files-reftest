@@ -12,4 +12,8 @@ export class MockPreprocessor implements Preprocessor {
 	getVersionInfo(): string {
 		return "";
 	}
+
+	finish(): Promise<void> {
+		return Promise.resolve();
+	}
 }

@@ -18,6 +18,11 @@ export interface AudioExtractor {
 	 * install したものがあれば uninstall する。
 	 */
 	dispose(): Promise<void>;
+
+	/**
+	 * 終了通知
+	 */
+	finish(): Promise<void>;
 }
 
 // この辺りのパラメータは決め打ちになってしまっているので、何かしらの手段で設定できるようにすべき

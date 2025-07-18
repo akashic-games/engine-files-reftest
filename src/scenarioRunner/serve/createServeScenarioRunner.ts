@@ -114,6 +114,9 @@ export async function createServeScenarioRunner(binSrc: TargetBinarySource): Pro
 		},
 		getVersionInfo: (): string => {
 			return serveBin.getVersionInfo();
+		},
+		finish: async (): Promise<void> => {
+			serveBin.finish();
 		}
 	};
 }

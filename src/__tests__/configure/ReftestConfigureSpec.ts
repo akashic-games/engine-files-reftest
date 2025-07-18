@@ -24,7 +24,10 @@ describe("ReftestConfigure", () => {
 			expect(result.outputHtml).toBeNull();
 			expect(result.timeoutErrorDirPath).toBeNull();
 			expect(result.useNpmCache).toBeFalsy();
-			expect(result.npmCacheDir.indexOf(path.join(os.tmpdir(), "_reftest")) !== -1).toBeTruthy();
+			expect(result.npmCacheDir).toBe(path.resolve(".", "__bincache"));
+			expect(result.clearCache).toBeFalsy();
+			expect(result.tempDownlodDir.indexOf(path.join(os.tmpdir(), "reftest_")) !== -1).toBeTruthy();
+
 		});
 
 		test("useNpmCache が真の時、npmCacheDir がキャッシュ用のディレクトリとなる", () => {
@@ -50,7 +53,9 @@ describe("ReftestConfigure", () => {
 			expect(result.outputHtml).toBeNull();
 			expect(result.timeoutErrorDirPath).toBeNull();
 			expect(result.useNpmCache).toBeFalsy();
-			expect(result.npmCacheDir.indexOf(path.join(os.tmpdir(), "_reftest")) !== -1).toBeTruthy();
+			expect(result.npmCacheDir).toBe(path.resolve(path.resolve(__dirname, "../fixture"), "__bincache"));
+			expect(result.clearCache).toBeFalsy();
+			expect(result.tempDownlodDir.indexOf(path.join(os.tmpdir(), "reftest_")) !== -1).toBeTruthy();
 		});
 		test("設定ファイルとその他オプションの指定がある場合はオプションで指定した値が優先される", () => {
 			const option: ReftestCommandOption = {
@@ -92,7 +97,9 @@ describe("ReftestConfigure", () => {
 			expect(result.outputHtml).toBeNull();
 			expect(result.timeoutErrorDirPath).toBeNull();
 			expect(result.useNpmCache).toBeFalsy();
-			expect(result.npmCacheDir.indexOf(path.join(os.tmpdir(), "_reftest")) !== -1).toBeTruthy();
+			expect(result.npmCacheDir).toBe(path.resolve(path.resolve(__dirname, "../fixture"), "__bincache"));
+			expect(result.clearCache).toBeFalsy();
+			expect(result.tempDownlodDir.indexOf(path.join(os.tmpdir(), "reftest_")) !== -1).toBeTruthy();
 		});
 		test("設定ファイルが存在しない場合はエラーになる", (done) => {
 			const notExistConfigPath = path.resolve(__dirname, "../fixture/notexist.config.json");

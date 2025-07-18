@@ -10,6 +10,7 @@ import type { NormalizedReftestEntry, ReftestEntry } from "./configure/ReftestEn
 import { normalizeReftestEntry } from "./configure/ReftestEntry";
 import { renderHtmlReport } from "./outputResult/renderHtmlReport";
 import { renderHtmlReportIndex } from "./outputResult/renderHtmlReportIndex";
+import type { RunnerUnit} from "./RunnerUnit";
 import { withRunnerUnit } from "./RunnerUnit";
 import type { ReftestMode } from "./types/ReftestMode";
 import type { ReftestResult } from "./types/ReftestResult";
@@ -51,7 +52,8 @@ commander
 	.option("--use-npm-cache", "Use cache npm binaries")
 	.option("--npm-cache-dir-path <path>",
 		"Path to save npm. If not specified default path is './.npmcache' or if configurePath is specified 'CONFIGURE_PATH/../.npmcache'"
-	);
+	)
+	.option("--clear-cache", "When using cache, delete the cache and reinstall");
 
 void (async () => {
 	try {
@@ -84,9 +86,11 @@ void (async () => {
 			mkdirpSync(htmlReportDir);
 		}
 
+		const runnerUnitList: RunnerUnit[] = [];
 		for (const testType of targetTestTypes) {
 			reftestResultMap[testType] = Object.create(null);
 			await withRunnerUnit<void>({testType, configure}, async (runnerUnit) => {
+				runnerUnitList.push(runnerUnit);
 				for (const reftestEntry of reftestEntries) {
 					const configureHash = createConfigureHash(reftestEntry);
 					const configureHashPath = path.resolve(reftestEntry.expectedDirPath, "__hash__");
@@ -175,6 +179,9 @@ void (async () => {
 					}
 				}
 			});
+		}
+		for (const unit of runnerUnitList) {
+			await unit.dispose();
 		}
 		// 正解画像更新のみであればテスト結果の出力・検証をする必要はないのでここで処理を終了する。
 		if (mode === "update-expected" || mode === "update-expected-only-diff") {

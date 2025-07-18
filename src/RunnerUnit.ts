@@ -70,6 +70,13 @@ export class RunnerUnit {
 			this.scenarioRunner.dispose()
 		]);
 	}
+	finish(): Promise<unknown> {
+		return Promise.all([
+			this.preprocessor?.finish(),
+			this.audioExtractor?.finish(),
+			this.scenarioRunner.finish()
+		]);
+	}
 
 	getVersionInfo(): string {
 		return [
@@ -89,7 +96,7 @@ export async function withRunnerUnit<T>(param: GetRunnerUnitParameterObject, fun
 	try {
 		return await fun(runnerUnit);
 	} finally {
-		await runnerUnit.dispose();
+		await runnerUnit.finish();
 	}
 }
 
@@ -99,34 +106,30 @@ async function getRunnerUnit(param: GetRunnerUnitParameterObject): Promise<Runne
 	let audioExtractor: AudioExtractor | null = null;
 
 	const versionLatest = "latest";
-	let serveVer = versionLatest;
-	if (param.configure.serveVer && param.configure.servePath == null) {
-		serveVer = param.configure.serveVer;
-	}
 	// npmCacheDir にはデフォルトパスがあるので、nullにはならない想定
-	const downloadDirPath = path.join(path.resolve(param.configure.npmCacheDir), "serve", serveVer);
+	const downloadDirPath = path.join(path.resolve(param.configure.tempDownlodDir), "serve");
 	const serveBinSrc: TargetBinarySource = param.configure.servePath ?
 		{ type: "local", path: path.resolve(param.configure.servePath) } :
 		{
 			type: "published",
 			downloadDirPath: downloadDirPath,
 			useNpmCache: param.configure.useNpmCache,
-			version: serveVer
+			npmCacheDir: path.join(param.configure.npmCacheDir, "serve"),
+			clearCache: param.configure.clearCache,
+			version: param.configure.serveVer ?? versionLatest
 		};
 	switch (param.testType) {
 		case "sandbox":
-			let sandboxVer = versionLatest;
-			if (param.configure.sandboxVer && param.configure.sandboxPath == null) {
-				sandboxVer = param.configure.sandboxVer;
-			}
-			const sandboxDownloadDirPath = path.join(path.resolve(param.configure.npmCacheDir), "sandbox", sandboxVer);
+			const sandboxDownloadDirPath = path.join(path.resolve(param.configure.tempDownlodDir), "sandbox");
 			const sandboxBinSrc: TargetBinarySource = param.configure.sandboxPath ?
 				{ type: "local", path: path.resolve(param.configure.sandboxPath) } :
 				{
 					type: "published",
 					downloadDirPath: sandboxDownloadDirPath,
 					useNpmCache: param.configure.useNpmCache,
-					version: sandboxVer
+					npmCacheDir: path.join(param.configure.npmCacheDir, "sandbox"),
+					clearCache: param.configure.clearCache,
+					version: param.configure.sandboxVer ?? versionLatest
 				};
 			scenarioRunner = await createStaticHostScenarioRunner(await createAkashicSandbox(sandboxBinSrc));
 			break;
@@ -135,26 +138,30 @@ async function getRunnerUnit(param: GetRunnerUnitParameterObject): Promise<Runne
 			audioExtractor = await createServeAudioExtractor(serveBinSrc);
 			break;
 		case "export-zip":
-			const exportZipDownloadDirPath = path.join(path.resolve(param.configure.npmCacheDir), "export-zip", "latest");
+			const exportZipDownloadDirPath = path.join(path.resolve(param.configure.tempDownlodDir), "export-zip");
 			const exportZipBinarySource: TargetBinarySource = param.configure.exportZipPath ?
 				{ type: "local", path: path.resolve(param.configure.exportZipPath) } :
 				{
 					type: "published",
 					downloadDirPath: exportZipDownloadDirPath,
 					useNpmCache:  param.configure.useNpmCache,
+					npmCacheDir: path.join(param.configure.npmCacheDir, "export-zip"),
+					clearCache: param.configure.clearCache,
 					version: versionLatest
 				};
 			preprocessor = await createExportZipPreprocessor(exportZipBinarySource);
 			scenarioRunner = await createServeScenarioRunner(serveBinSrc);
 			break;
 		case "export-html":
-			const exportHtmlDownloadDirPath = path.join(path.resolve(param.configure.npmCacheDir), "export-html", "latest");
+			const exportHtmlDownloadDirPath = path.join(path.resolve(param.configure.tempDownlodDir), "export-html");
 			const exportHtmlBinarySource: TargetBinarySource = param.configure.exportHtmlPath ?
 				{ type: "local", path: path.resolve(param.configure.exportHtmlPath) } :
 				{
 					type: "published",
 					downloadDirPath: exportHtmlDownloadDirPath,
 					useNpmCache:  param.configure.useNpmCache,
+					npmCacheDir: path.join(param.configure.npmCacheDir, "export-html"),
+					clearCache: param.configure.clearCache,
 					version: versionLatest
 				};
 			preprocessor = await createExportHtmlPreprocessor(exportHtmlBinarySource);

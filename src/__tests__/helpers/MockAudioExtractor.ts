@@ -14,4 +14,8 @@ export class MockAudioExtractor implements AudioExtractor {
 	dispose(): Promise<void> {
 		return Promise.resolve();
 	}
+
+	finish(): Promise<void> {
+		return Promise.resolve();
+	}
 }

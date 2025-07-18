@@ -226,7 +226,9 @@ describe("withRunnerUnit", () => {
 			outputHtml: null,
 			timeoutErrorDirPath: null,
 			useNpmCache: false,
-			npmCacheDir: path.resolve(".", ".npmcache")
+			npmCacheDir: path.resolve(".", ".npmcache"),
+			tempDownlodDir: path.resolve(".", ".npmcache"),
+			clearCache: false
 		};
 	});
 	test("testTypeがserveの場合、createServeScenarioRunner関数とcreateWebbrowserAudioExtractor関数が実行される", async () => {

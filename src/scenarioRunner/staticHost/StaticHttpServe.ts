@@ -45,6 +45,9 @@ export class StaticHttpServe implements StaticHost {
 	dispose(): void {
 		// do nothing
 	}
+	finish(): void {
+		// do nothing
+	}
 }
 
 export async function createStaticHttpServe(): Promise<StaticHttpServe> {

@@ -28,6 +28,9 @@ export async function createExportZipPreprocessor(binSrc: TargetBinarySource): P
 		dispose: async (): Promise<void> => {
 			exportZipBin.dispose();
 		},
+		finish: async (): Promise<void> => {
+			exportZipBin.finish();
+		},
 		getVersionInfo: (): string => {
 			return getVersionInfo();
 		}
