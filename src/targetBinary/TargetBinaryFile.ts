@@ -54,10 +54,10 @@ class PublishedTargetBinaryFile implements TargetBinaryFile {
 		this.nameInfo = nameInfo;
 		this.binSrc = binSrc;
 		let version = binSrc.version;
-
 		if (version === "latest") {
 			version = execCommand(`npm info ${nameInfo.moduleName} version`).trim();
 		}
+
 		this.downloadDir = path.join(binSrc.downloadDirPath, version);
 		this.npmCacheDir = path.join(binSrc.npmCacheDir, version);
 		const targetDir = this.binSrc.useNpmCache && fs.existsSync(this.npmCacheDir) ? this.npmCacheDir : this.downloadDir;
