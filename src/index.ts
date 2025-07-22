@@ -69,7 +69,7 @@ void (async () => {
 			// globはwindows環境のdelimiterに対応できないので、windows環境のdelimiterがあればlinux環境のものに変換する必要がある。
 			return glob.sync(pattern.replace(/\\/g, "/")).map(p => {
 				// テスト内容の動的読み込みのため、require の lint エラーを抑止
-				/* eslint-disable @typescript-eslint/no-require-imports */
+				// eslint-disable-next-line @typescript-eslint/no-require-imports
 				const reftestEntry = require(path.resolve(p)) as ReftestEntry;
 				return normalizeReftestEntry(reftestEntry, path.resolve(p));
 			});

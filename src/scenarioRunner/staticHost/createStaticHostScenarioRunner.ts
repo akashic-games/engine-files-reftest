@@ -46,12 +46,17 @@ export async function createStaticHostScenarioRunner(param: CreateStaticHostScen
 					// 稀に終了メッセージを流す前にコンテンツが終了することがあるため、コンテンツが確実に終了している時間を経過したら強制的に待機を解除する処理を用意した
 					await withTimeLimit(CONTENT_LIMIT_TIME, "content did not end in time", () => {
 						// この時点で、page は代入済みのはず
-						return evaluateScenarioByPuppeteer(page!, scenarioPath, (s: Screenshot) => {
-							screenshots.push({
-								fileName: `try${playCount}_${s.fileName}`,
-								base64: s.base64
-							});
-						}, serveProcess.canvasSelector);
+						return evaluateScenarioByPuppeteer(
+							page!,
+							scenarioPath,
+							(s: Screenshot) => {
+								screenshots.push({
+									fileName: `try${playCount}_${s.fileName}`,
+									base64: s.base64
+								});
+							},
+							serveProcess.canvasSelector
+						);
 					});
 					await page.close();
 				}
