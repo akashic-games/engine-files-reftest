@@ -1,8 +1,10 @@
 # CHANGELOG
 
-## Unreleased changes
+## 3.3.29
 
 * akashic serve 環境で、passive モードのコンテンツのスクリーンショット画像の撮影領域がずれている問題の修正
+* reftest実行エラー時にスクリーンショットを撮るように
+  * `--error-screenshot-dir-path` オプションでエラー時のスクリーンショット画像を保存するディレクトリを指定できるように
 
 ## 3.3.28
 

@@ -9,8 +9,13 @@ import type { StaticHost } from "./StaticHost";
 
 const CONTENT_LIMIT_TIME = 300000; // コンテンツ実行時間の上限
 
+interface CreateStaticHostScenarioRunnerParameterObject {
+	type: "sandbox" | "export-html";
+	hostBin: StaticHost;
+}
+
 // このScenarioRunnerはコンテンツをリアルタイムモードでしか実行できないので、modeは必ずpassiveとなる
-export async function createStaticHostScenarioRunner(hostBin: StaticHost): Promise<ScenarioRunner> {
+export async function createStaticHostScenarioRunner(param: CreateStaticHostScenarioRunnerParameterObject): Promise<ScenarioRunner> {
 	return {
 		run: async (
 			contentDirPath: string,
@@ -22,7 +27,7 @@ export async function createStaticHostScenarioRunner(hostBin: StaticHost): Promi
 				return { status: "skipped-unsupported", screenshots: [] };
 
 			const screenshots: Screenshot[] = [];
-			const serveProcess = await hostBin.start({ contentDirPath, hostname: "localhost" });
+			const serveProcess = await param.hostBin.start({ contentDirPath, hostname: "localhost" });
 			const browser = await puppeteer.launch({
 				headless: true,
 				executablePath: process.env.CHROME_BIN || undefined,
@@ -56,13 +61,21 @@ export async function createStaticHostScenarioRunner(hostBin: StaticHost): Promi
 					await page.close();
 				}
 			} catch (e) {
+				// TODO: この辺りのエラーハンドリングは他のScenarioRunnerとほぼ同じコードになっているので、「シナリオを実行してエラー時にスクリーンショットを撮る」一連の流れを共通化すべき
 				if (e instanceof TimeoutError) {
-					const timeoutImage: Screenshot = {
-						fileName: `timeout_try${playCount}_${extractDirname(scenarioPath)}.png`,
+					const screenshot: Screenshot = {
+						fileName: `${param.type}_timeout_try${playCount}_${extractDirname(scenarioPath)}.png`,
 						base64: await page!.screenshot({ encoding: "base64" }) // TimeoutError は withTimeLimit() から来るので、page は代入済みのはず
 					};
-					return { status: "timeout", timeoutImage };
+					return { status: "timeout", screenshot };
 				} else {
+					if (page && !page.isClosed()) {
+						const screenshot: Screenshot = {
+							fileName: `${param.type}_error_try${playCount}_${extractDirname(scenarioPath)}.png`,
+							base64: await page.screenshot({ encoding: "base64" })
+						};
+						return { status: "error", screenshot, error: e };
+					}
 					throw e;
 				}
 			} finally {
@@ -76,7 +89,7 @@ export async function createStaticHostScenarioRunner(hostBin: StaticHost): Promi
 			// do nothing
 		},
 		getVersionInfo: (): string => {
-			return hostBin.getVersionInfo();
+			return param.hostBin.getVersionInfo();
 		}
 	};
 }

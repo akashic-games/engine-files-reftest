@@ -22,7 +22,11 @@ export class RunnerUnit {
 	protected preprocessor: Preprocessor | null;
 	protected audioExtractor: AudioExtractor | null;
 
-	constructor(scenarioRunner: ScenarioRunner, preprocessor: Preprocessor | null, audioExtractor: AudioExtractor | null) {
+	constructor(
+		scenarioRunner: ScenarioRunner,
+		preprocessor: Preprocessor | null,
+		audioExtractor: AudioExtractor | null
+	) {
 		this.scenarioRunner = scenarioRunner;
 		this.preprocessor = preprocessor;
 		this.audioExtractor = audioExtractor;
@@ -49,7 +53,7 @@ export class RunnerUnit {
 			entry.executionMode,
 			entry.playTimes
 		);
-		if (entry.enableAudio && this.audioExtractor && ret.status !== "timeout") {
+		if (entry.enableAudio && this.audioExtractor && ret.status !== "timeout" && ret.status !== "error") {
 			const additional = await this.audioExtractor.run(
 				path.resolve(contentDirPath),
 				path.resolve(entry.scenario.path),
@@ -114,10 +118,11 @@ async function getRunnerUnit(param: GetRunnerUnitParameterObject): Promise<Runne
 			if (param.configure.sandboxVer && sandboxBinSrc.type === "published") {
 				sandboxBinSrc.version = param.configure.sandboxVer;
 			}
-			scenarioRunner = await createStaticHostScenarioRunner(await createAkashicSandbox(sandboxBinSrc));
+			const sandbox = await createAkashicSandbox(sandboxBinSrc);
+			scenarioRunner = await createStaticHostScenarioRunner({ type: "sandbox", hostBin: sandbox });
 			break;
 		case "serve":
-			scenarioRunner = await createServeScenarioRunner(serveBinSrc);
+			scenarioRunner = await createServeScenarioRunner({ type: "serve", binSrc: serveBinSrc });
 			audioExtractor = await createServeAudioExtractor(serveBinSrc);
 			break;
 		case "export-zip":
@@ -125,14 +130,15 @@ async function getRunnerUnit(param: GetRunnerUnitParameterObject): Promise<Runne
 				{ type: "local", path: path.resolve(param.configure.exportZipPath) } :
 				{ type: "published", downloadDirPath: downloadDirPath };
 			preprocessor = await createExportZipPreprocessor(exportZipBinarySource);
-			scenarioRunner = await createServeScenarioRunner(serveBinSrc);
+			scenarioRunner = await createServeScenarioRunner({ type: "export-zip", binSrc: serveBinSrc });
 			break;
 		case "export-html":
 			const exportHtmlBinarySource: TargetBinarySource = param.configure.exportHtmlPath ?
 				{ type: "local", path: path.resolve(param.configure.exportHtmlPath) } :
 				{ type: "published", downloadDirPath: downloadDirPath };
 			preprocessor = await createExportHtmlPreprocessor(exportHtmlBinarySource);
-			scenarioRunner = await createStaticHostScenarioRunner(new StaticHttpServe());
+			const staticHttpServe = new StaticHttpServe();
+			scenarioRunner = await createStaticHostScenarioRunner({ type: "export-html", hostBin: staticHttpServe });
 			break;
 		case "android":
 			if (!param.configure.android || !param.configure.android.apkPath || !param.configure.android.playlogClientPath) {
@@ -146,7 +152,7 @@ async function getRunnerUnit(param: GetRunnerUnitParameterObject): Promise<Runne
 				appPackage: param.configure.android.appPackage,
 				appActivity: param.configure.android.appActivity
 			};
-			scenarioRunner = await createAndroidScenarioRunner(params);
+			scenarioRunner = await createAndroidScenarioRunner({type: "android", ...params});
 			break;
 		default:
 			throw new Error("Please specify --test-type <type>. <type> is serve, export-zip, export-html, android, or all.");

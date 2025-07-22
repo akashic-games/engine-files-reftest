@@ -33,6 +33,7 @@ export interface ReftestCommandOption {
 	androidAppActivity?: string;
 	outputHtml?: string;
 	timeoutErrorDirPath?: string;
+	errorScreenshotDirPath?: string;
 	useNpmCache?: boolean;
 	npmCacheDirPath?: string;
 }
@@ -62,6 +63,7 @@ export interface ReftestConfigure {
 	android: AndroidConfigure | null;
 	outputHtml: string | null;
 	timeoutErrorDirPath: string | null;
+	errorScreenshotDirPath: string | null;
 	useNpmCache: boolean | false;
 	npmCacheDir: string | null;
 }
@@ -83,6 +85,7 @@ export interface NormalizedReftestConfigure extends ReftestConfigure {
 	android: AndroidConfigure | null;
 	outputHtml: string | null;
 	timeoutErrorDirPath: string | null;
+	errorScreenshotDirPath: string | null;
 	useNpmCache: boolean;
 	npmCacheDir: string;
 }
@@ -124,6 +127,7 @@ export function createReftestConfigure(option: ReftestCommandOption): Normalized
 			android: null,
 			outputHtml: null,
 			timeoutErrorDirPath: null,
+			errorScreenshotDirPath: null,
 			useNpmCache: false,
 			npmCacheDir: null,
 		};
@@ -145,6 +149,7 @@ export function createReftestConfigure(option: ReftestCommandOption): Normalized
 	configure.threshold = option.threshold ?? (configure.threshold ?? null);
 	configure.outputHtml = option.outputHtml ?? resolvePath(dirPath, configure.outputHtml);
 	configure.timeoutErrorDirPath = option.timeoutErrorDirPath ?? resolvePath(dirPath, configure.timeoutErrorDirPath);
+	configure.errorScreenshotDirPath = option.errorScreenshotDirPath ?? resolvePath(dirPath, configure.errorScreenshotDirPath);
 	configure.useNpmCache = option.useNpmCache ?? (configure.useNpmCache ?? false);
 	configure.npmCacheDir = option.npmCacheDirPath ?? null;
 	if (option.androidApkPath || option.androidPlaylogClientPath) {
