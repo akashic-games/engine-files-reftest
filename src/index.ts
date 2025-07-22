@@ -52,8 +52,7 @@ commander
 	.option("--use-npm-cache", "Use cache npm binaries")
 	.option("--npm-cache-dir-path <path>",
 		"Path to save npm. If not specified default path is './.npmcache' or if configurePath is specified 'CONFIGURE_PATH/../.npmcache'"
-	)
-	.option("--clear-cache", "When using cache, delete the cache and reinstall");
+	);
 
 void (async () => {
 	try {

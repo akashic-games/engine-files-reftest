@@ -107,15 +107,14 @@ async function getRunnerUnit(param: GetRunnerUnitParameterObject): Promise<Runne
 
 	const versionLatest = "latest";
 	// npmCacheDir にはデフォルトパスがあるので、nullにはならない想定
-	const downloadDirPath = path.join(path.resolve(param.configure.tempDownlodDir), "serve");
+	const serveDownloadDirPath = path.join(path.resolve(param.configure.tempDownlodDir), "serve");
 	const serveBinSrc: TargetBinarySource = param.configure.servePath ?
 		{ type: "local", path: path.resolve(param.configure.servePath) } :
 		{
 			type: "published",
-			downloadDirPath: downloadDirPath,
+			downloadDirPath: serveDownloadDirPath,
 			useNpmCache: param.configure.useNpmCache,
 			npmCacheDir: path.join(param.configure.npmCacheDir, "serve"),
-			clearCache: param.configure.clearCache,
 			version: param.configure.serveVer ?? versionLatest
 		};
 	switch (param.testType) {
@@ -128,7 +127,6 @@ async function getRunnerUnit(param: GetRunnerUnitParameterObject): Promise<Runne
 					downloadDirPath: sandboxDownloadDirPath,
 					useNpmCache: param.configure.useNpmCache,
 					npmCacheDir: path.join(param.configure.npmCacheDir, "sandbox"),
-					clearCache: param.configure.clearCache,
 					version: param.configure.sandboxVer ?? versionLatest
 				};
 			scenarioRunner = await createStaticHostScenarioRunner(await createAkashicSandbox(sandboxBinSrc));
@@ -146,7 +144,6 @@ async function getRunnerUnit(param: GetRunnerUnitParameterObject): Promise<Runne
 					downloadDirPath: exportZipDownloadDirPath,
 					useNpmCache:  param.configure.useNpmCache,
 					npmCacheDir: path.join(param.configure.npmCacheDir, "export-zip"),
-					clearCache: param.configure.clearCache,
 					version: versionLatest
 				};
 			preprocessor = await createExportZipPreprocessor(exportZipBinarySource);
@@ -161,7 +158,6 @@ async function getRunnerUnit(param: GetRunnerUnitParameterObject): Promise<Runne
 					downloadDirPath: exportHtmlDownloadDirPath,
 					useNpmCache:  param.configure.useNpmCache,
 					npmCacheDir: path.join(param.configure.npmCacheDir, "export-html"),
-					clearCache: param.configure.clearCache,
 					version: versionLatest
 				};
 			preprocessor = await createExportHtmlPreprocessor(exportHtmlBinarySource);

@@ -11,7 +11,6 @@ export type TargetBinarySourcePublished = {
 	version: string;
 	useNpmCache?: boolean;
 	npmCacheDir: string;
-	clearCache: boolean;
 };
 
 export type TargetBinarySource = TargetBinarySourceLocal | TargetBinarySourcePublished;

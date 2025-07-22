@@ -36,7 +36,6 @@ export interface ReftestCommandOption {
 	timeoutErrorDirPath?: string;
 	useNpmCache?: boolean;
 	npmCacheDirPath?: string;
-	clearCache?: boolean;
 }
 
 export interface AndroidConfigure {
@@ -66,7 +65,6 @@ export interface ReftestConfigure {
 	timeoutErrorDirPath: string | null;
 	useNpmCache: boolean | false;
 	npmCacheDir: string | null;
-	clearCache: boolean | false;
 }
 
 export interface NormalizedReftestConfigure extends ReftestConfigure {
@@ -89,7 +87,6 @@ export interface NormalizedReftestConfigure extends ReftestConfigure {
 	useNpmCache: boolean;
 	npmCacheDir: string;
 	tempDownlodDir: string;
-	clearCache: boolean;
 }
 
 
@@ -130,8 +127,7 @@ export function createReftestConfigure(option: ReftestCommandOption): Normalized
 			outputHtml: null,
 			timeoutErrorDirPath: null,
 			useNpmCache: false,
-			npmCacheDir: null,
-			clearCache: false
+			npmCacheDir: null
 		};
 	}
 	const dirPath = configurePath ? path.dirname(configurePath) : ".";
@@ -153,7 +149,6 @@ export function createReftestConfigure(option: ReftestCommandOption): Normalized
 	configure.timeoutErrorDirPath = option.timeoutErrorDirPath ?? resolvePath(dirPath, configure.timeoutErrorDirPath);
 	configure.useNpmCache = option.useNpmCache ?? (configure.useNpmCache ?? false);
 	configure.npmCacheDir = option.npmCacheDirPath ?? null;
-	configure.clearCache = option.clearCache ?? (configure.clearCache ?? false);
 	if (option.androidApkPath || option.androidPlaylogClientPath) {
 		if (!configure.android) {
 			configure.android = {
