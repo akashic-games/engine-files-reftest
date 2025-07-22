@@ -9,7 +9,7 @@ const bundledReftestHelperSrcMap: { [moduleName: string]: string } = {};
 export async function injectReftestHelper(dirPath: string): Promise<void> {
 	// reftest-helperをコンテンツ側に差し込むための処理
 	// game.jsonの動的読み込みのため、require の lint エラーを抑止
-	/* eslint-disable @typescript-eslint/no-require-imports */
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
 	const originalGameJson = require(path.resolve(dirPath, "game.json"));
 	let reftestHelper = "reftest-helper";
 	if (!originalGameJson.environment
@@ -35,7 +35,7 @@ export function injectScripts(dirPath: string, scriptPaths: string[]): void {
 function injectScriptToEntryPoint(dirPath: string, script: string): void {
 	// scriptをエントリポイントに差し込む処理
 	// game.jsonの動的読み込みのため、require の lint エラーを抑止
-	/* eslint-disable @typescript-eslint/no-require-imports */
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
 	const gameJson = require(path.resolve(dirPath, "game.json"));
 	// mainかmainSceneのアセットが無ければそもそもコンテンツは動かないので、どちらかは必ず存在すると想定する
 	const mainScriptPath = gameJson.main ?? gameJson.assets.mainScene.path;

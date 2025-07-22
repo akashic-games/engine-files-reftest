@@ -104,7 +104,7 @@ export function createReftestConfigure(option: ReftestCommandOption): Normalized
 	let configure: ReftestConfigure;
 	if (configurePath) {
 		// 設定ファイルの動的読み込みのため、require の lint エラーを抑止
-		/* eslint-disable @typescript-eslint/no-require-imports */
+		// eslint-disable-next-line @typescript-eslint/no-require-imports
 		configure = require(configurePath) as ReftestConfigure;
 	} else {
 		configure = {
