@@ -111,9 +111,6 @@ export async function createServeAudioExtractor(binSrc: TargetBinarySource): Pro
 
 		dispose: async (): Promise<void> => {
 			serveBin.dispose();
-		},
-		finish: async (): Promise<void> => {
-			serveBin.finish();
 		}
 	};
 }

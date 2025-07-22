@@ -24,9 +24,6 @@ export async function createExportHtmlPreprocessor(binSrc: TargetBinarySource): 
 		dispose: async (): Promise<void> => {
 			exportHtmlBin.dispose();
 		},
-		finish: async (): Promise<void> => {
-			exportHtmlBin.finish();
-		},
 		getVersionInfo: (): string => {
 			return getVersionInfo();
 		}

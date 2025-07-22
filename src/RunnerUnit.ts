@@ -70,13 +70,6 @@ export class RunnerUnit {
 			this.scenarioRunner.dispose()
 		]);
 	}
-	finish(): Promise<unknown> {
-		return Promise.all([
-			this.preprocessor?.finish(),
-			this.audioExtractor?.finish(),
-			this.scenarioRunner.finish()
-		]);
-	}
 
 	getVersionInfo(): string {
 		return [
@@ -93,11 +86,7 @@ interface GetRunnerUnitParameterObject {
 
 export async function withRunnerUnit<T>(param: GetRunnerUnitParameterObject, fun: (ru: RunnerUnit) => Promise<T>): Promise<T> {
 	const runnerUnit = await getRunnerUnit(param);
-	try {
-		return await fun(runnerUnit);
-	} finally {
-		await runnerUnit.finish();
-	}
+	return await fun(runnerUnit);
 }
 
 async function getRunnerUnit(param: GetRunnerUnitParameterObject): Promise<RunnerUnit> {

@@ -60,7 +60,6 @@ engine-files-reftest -c <path> [--options]
 |--timeout-error-dir-path <path>| |指定されたディレクトリ下にタイムアウト時のスクリーンショットを出力する。||
 |--use-npm-cache| |reftest 実行に必要とする npm モジュールはキャッシュされたものを使用する。||
 |--npm-cache-dir-path <path>| |npm モジュールのキャッシュを保存する、またはキャッシュを参照するディレクトリを指定する。デフォルトでは reftest.configure.json/../.npmcache または ./.npmcache||
-|--clear-cache| |`--use-npm-cache` または `--npm-cache-dir-path` 利用時にキャッシュが存在する場合でも再度 npm install を実行する。||
 ※1: 設定ファイルかコマンド実行時のどちらかで必ず指定する必要があります。設定ファイルで指定されていればコマンド実行時に指定する必要はありません。
 
 ### 設定ファイルの書き方

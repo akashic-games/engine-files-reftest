@@ -19,11 +19,6 @@ export interface TargetBinaryFile {
 	 * e.g. 一時ディレクトリに npm install されたものがあれば uninstall される。
 	 */
 	dispose(): void;
-
-	/**
-	 * 終了通知
-	 */
-	finish(): void;
 }
 
 /**
@@ -37,9 +32,6 @@ class LocalTargetBinaryFile implements TargetBinaryFile {
 	}
 
 	dispose(): void {
-		// do nothing
-	}
-	finish(): void {
 		// do nothing
 	}
 }
@@ -69,10 +61,7 @@ class PublishedTargetBinaryFile implements TargetBinaryFile {
 		this.downloadDir = path.join(binSrc.downloadDirPath, version);
 		this.npmCacheDir = path.join(binSrc.npmCacheDir, version);
 		const targetDir = this.binSrc.useNpmCache && fs.existsSync(this.npmCacheDir) ? this.npmCacheDir : this.downloadDir;
-		if (
-			this.binSrc.useNpmCache && !fs.existsSync(this.npmCacheDir) && !fs.existsSync(this.downloadDir)
-			|| !this.binSrc.useNpmCache && !fs.existsSync(this.downloadDir)
-		) {
+		if (!fs.existsSync(targetDir)) {
 			initializeNpmDir(targetDir);
 			withCwdSync(targetDir, () => {
 				execCommand(`npm i ${nameInfo.moduleName}@${binSrc.version}`);
@@ -84,19 +73,13 @@ class PublishedTargetBinaryFile implements TargetBinaryFile {
 	}
 
 	dispose(): void {
-		if (this.binSrc.type === "published" && !this.binSrc.useNpmCache) {
-			if (fs.existsSync(this.binSrc.downloadDirPath)) {
-				fs.rmdirSync(this.binSrc.downloadDirPath, { recursive: true });
-			}
-		}
-	}
-
-	finish(): void {
 		if (this.binSrc.useNpmCache) {
 			if (!fs.existsSync(this.npmCacheDir)) {
 				fs.mkdirSync(this.npmCacheDir, { recursive: true });
 				fs.renameSync(this.downloadDir, this.npmCacheDir);
 			}
+		} else if (fs.existsSync(this.binSrc.downloadDirPath)) {
+			fs.rmdirSync(this.binSrc.downloadDirPath, { recursive: true });
 		}
 	}
 }

@@ -12,9 +12,4 @@ export interface Preprocessor {
 	 * 利用しているツールのバージョン情報を取得する。
 	*/
 	getVersionInfo(): string;
-
-	/**
-	 * 終了通知
-	 */
-	finish(): Promise<void>;
 }

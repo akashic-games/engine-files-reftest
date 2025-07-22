@@ -135,9 +135,6 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 			appiumProcess.stop();
 			serveBin.dispose();
 		},
-		finish: async (): Promise<void> => {
-			serveBin.finish();
-		},
 		getVersionInfo: (): string => {
 			return serveBin.getVersionInfo() + ", " + emulatorProcess.getVersionInfo();
 		}
