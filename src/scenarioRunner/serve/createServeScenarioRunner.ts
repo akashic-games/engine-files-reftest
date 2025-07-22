@@ -1,3 +1,5 @@
+import * as fs from "fs";
+import * as path from "path";
 import { calculateFinishedTime } from "@akashic/amflow-util/lib/calculateFinishedTime";
 import * as puppeteer from "puppeteer";
 import type { TargetBinarySource } from "../../targetBinary/TargetBinarySource";
@@ -15,8 +17,13 @@ import { createAkashicServe } from "./AkashicServe";
 // コンテンツ実行時間の上限。テスト時に実行時間がこの長さを超える場合、確実に失敗することに注意が必要
 const CONTENT_LIMIT_MAX_TIME = 300000;
 
-export async function createServeScenarioRunner(binSrc: TargetBinarySource): Promise<ScenarioRunner> {
-	const serveBin = await createAkashicServe(binSrc);
+interface CreateServeScenarioRunnerParameterObject {
+	type: "serve" | "export-zip";
+	binSrc: TargetBinarySource;
+}
+
+export async function createServeScenarioRunner(param: CreateServeScenarioRunnerParameterObject): Promise<ScenarioRunner> {
+	const serveBin = await createAkashicServe(param.binSrc);
 	return {
 		run: async (
 			contentDirPath: string,
@@ -44,7 +51,7 @@ export async function createServeScenarioRunner(binSrc: TargetBinarySource): Pro
 				page.on("console", msg => {
 					console.log("ServeScenarioRunner: ", msg.text().trimEnd());
 				});
-				/* eslint-disable @typescript-eslint/no-require-imports */
+				// eslint-disable-next-line @typescript-eslint/no-require-imports
 				const playlogJson = require(playlogJsonPath);
 				// テスト時間短縮のために、replayモードでserveアクセス時にreplayTargetTimeのクエリパラメータを付与
 				const replayTargetTime = calculateFinishedTime(
@@ -74,11 +81,22 @@ export async function createServeScenarioRunner(binSrc: TargetBinarySource): Pro
 					const expectedTime = replayTargetTime + 5000;
 					// 稀に終了メッセージを流す前にコンテンツが終了することがあるため、コンテンツが確実に終了している時間を経過したら強制的に待機を解除する処理を用意した
 					await withTimeLimit(Math.min(expectedTime, CONTENT_LIMIT_MAX_TIME), "content did not end in time", () => {
+						// コンテンツのサイズをgame.jsonから取得する
+						const gameJson = JSON.parse(fs.readFileSync(path.resolve(contentDirPath, "game.json"), "utf-8"));
+						// ウィンドウサイズをコンテンツのサイズとピッタリ同じにすると、ツールバーなどの要素が重なってしまうため、少し余白を持たせる
+						const margin = 100;
+						const viewport = { width: gameJson.width + margin, height: gameJson.height + margin };
 						return mode === "replay" ?
 							contentWaiter.promise :
-							evaluateScenarioByPuppeteer(page, playlogJsonPath, (s: Screenshot) => {
-								contentOutputReceiver.onScreenshot.fire(s);
-							});
+							evaluateScenarioByPuppeteer(
+								page,
+								playlogJsonPath,
+								(s: Screenshot) => {
+									contentOutputReceiver.onScreenshot.fire(s);
+								},
+								"canvas",
+								viewport
+							);
 					});
 					contentOutputReceiver.onScreenshot.removeAll();
 					contentOutputReceiver.onFinish.removeAll();
@@ -92,13 +110,21 @@ export async function createServeScenarioRunner(binSrc: TargetBinarySource): Pro
 					}
 				}
 			} catch (e) {
+				// TODO: この辺りのエラーハンドリングは他のScenarioRunnerとほぼ同じコードになっているので、「シナリオを実行してエラー時にスクリーンショットを撮る」一連の流れを共通化すべき
 				if (e instanceof TimeoutError) {
-					const timeoutImage: Screenshot = {
-						fileName: `timeout_try${playCount}_${extractDirname(scenarioPath)}.png`,
+					const screenshot: Screenshot = {
+						fileName: `${param.type}_timeout_try${playCount}_${extractDirname(scenarioPath)}.png`,
 						base64: await page.screenshot({ encoding: "base64" })
 					};
-					return { status: "timeout", timeoutImage };
+					return { status: "timeout", screenshot };
 				} else {
+					if (page && !page.isClosed()) {
+						const screenshot: Screenshot = {
+							fileName: `${param.type}_error_try${playCount}_${extractDirname(scenarioPath)}.png`,
+							base64: await page.screenshot({ encoding: "base64" })
+						};
+						return { status: "error", screenshot, error: e };
+					}
 					throw e;
 				}
 			} finally {

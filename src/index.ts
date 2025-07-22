@@ -12,6 +12,7 @@ import { renderHtmlReport } from "./outputResult/renderHtmlReport";
 import { renderHtmlReportIndex } from "./outputResult/renderHtmlReportIndex";
 import type { RunnerUnit} from "./RunnerUnit";
 import { withRunnerUnit } from "./RunnerUnit";
+import type { ReftestOutputWithScreenshots } from "./scenarioRunner/ScenarioRunner";
 import type { ReftestMode } from "./types/ReftestMode";
 import type { ReftestResult } from "./types/ReftestResult";
 import type { Screenshot } from "./types/Screenshot";
@@ -49,6 +50,7 @@ commander
 	.option("--android-app-activity <name>", "Name of android app-activity")
 	.option("--output-html <path>", "Output result of reftest as html file")
 	.option("--timeout-error-dir-path <path>", "Path to output screenshot at timeout")
+	.option("--error-screenshot-dir-path <path>", "Path to output screenshot at error")
 	.option("--use-npm-cache", "Use cache npm binaries")
 	.option("--npm-cache-dir-path <path>",
 		"Path to save npm. If not specified default path is './.npmcache' or if configurePath is specified 'CONFIGURE_PATH/../.npmcache'"
@@ -66,7 +68,7 @@ void (async () => {
 			// globはwindows環境のdelimiterに対応できないので、windows環境のdelimiterがあればlinux環境のものに変換する必要がある。
 			return glob.sync(pattern.replace(/\\/g, "/")).map(p => {
 				// テスト内容の動的読み込みのため、require の lint エラーを抑止
-				/* eslint-disable @typescript-eslint/no-require-imports */
+				// eslint-disable-next-line @typescript-eslint/no-require-imports
 				const reftestEntry = require(path.resolve(p)) as ReftestEntry;
 				return normalizeReftestEntry(reftestEntry, path.resolve(p));
 			});
@@ -77,6 +79,8 @@ void (async () => {
 		const diffDirBasePath: string | null = configure.diffDirPath ? path.resolve(configure.diffDirPath) : null;
 		const errorDiffDirBasePath: string | null = configure.errorDiffDirPath ? path.resolve(configure.errorDiffDirPath) : null;
 		const timeoutErrorDirPath: string | null =  configure.timeoutErrorDirPath ? path.resolve(configure.timeoutErrorDirPath) : null;
+		const errorScreenshotDirPath: string | null =  configure.errorScreenshotDirPath ?
+			path.resolve(configure.errorScreenshotDirPath) : null;
 		const imageDiffThreshold = configure.threshold;
 		const reftestResultMap: { [testType in TestType]: { [contentName: string]: ReftestResult }; } = Object.create(null);
 		let htmlReportDir: string | null = null;
@@ -105,12 +109,28 @@ void (async () => {
 					const output = await runnerUnit.run(reftestEntry);
 					const expectedDir = path.resolve(reftestEntry.expectedDirPath, testType);
 					console.log(`finish a runnerUnit (testType : ${testType})`);
+					// テスト結果の出力前にエラーやタイムアウトの処理を行う
+					switch (output.status) {
+						case "error":
+							if (errorScreenshotDirPath) {
+								outputScreenshots([output.screenshot], errorScreenshotDirPath);
+							}
+							throw output.error;
+						case "timeout":
+							if (timeoutErrorDirPath) {
+								outputScreenshots([output.screenshot], timeoutErrorDirPath);
+							}
+							if (mode === "update-expected" || mode === "update-expected-only-diff") {
+								throw new Error(`Timeout Error on "${reftestEntry.selfPath}"`);
+							}
+							break;
+					}
 					if (mode === "update-expected" || mode === "update-expected-only-diff") {
-						if (output.status === "timeout") throw new Error("Timeout Error");
 						if (fs.existsSync(expectedDir)) {
 							fs.rmdirSync(expectedDir, { recursive: true }); // 前回のテスト結果が残っていたら消す
 						}
-						outputScreenshots(output.screenshots, expectedDir);
+						// 上記のエラー処理でoutputの型がReftestOutputWithScreenshotsであることは保証されている
+						outputScreenshots((output as ReftestOutputWithScreenshots).screenshots, expectedDir);
 						// lastConfigureHashPath に現在実行した設定のハッシュ値を保存しておく
 						if (!fs.existsSync(lastConfigureHashPath)) {
 							fs.mkdirSync(configureHashPath, { recursive: true });
@@ -122,15 +142,19 @@ void (async () => {
 								} else {
 									console.log("succeeded to save hashed last configure file.");
 								}
-							});
+							}
+						);
 					} else {
 						const reftestEntryPath = path.relative(reftestEntryRootDirPath, reftestEntry.selfPath);
 						const outputDir = path.join(os.tmpdir(), reftestEntryPath, testType, Date.now().toString());
 						let diffs: FileDiff[] = [];
 						let errors: FileDiff[] = [];
 						let timeoutImagePath = "";
-						if (output.status !== "timeout") {
-							outputScreenshots(output.screenshots, outputDir);
+						if (output.status === "timeout" && timeoutErrorDirPath) {
+							timeoutImagePath = path.join(timeoutErrorDirPath, output.screenshot.fileName);
+						} else {
+							// 上記のエラー処理でoutputの型がReftestOutputWithScreenshotsであることは保証されている
+							outputScreenshots((output as ReftestOutputWithScreenshots).screenshots, outputDir);
 							diffs = output.status === "skipped-unsupported" ? [] : diffDirectory(expectedDir, outputDir);
 							errors = diffs.filter(d => {
 								// 音声の出力タイミングを制御できない且つ毎回音量等にブレが生じるため、音声の波形画像については他のスクリーンショットとは別の閾値を設ける
@@ -146,14 +170,7 @@ void (async () => {
 							if (errorDiffDirBasePath) {
 								outputDiffImages(errors, path.join(errorDiffDirBasePath, reftestEntryPath, testType));
 							}
-						} else {
-							if (timeoutErrorDirPath && output.timeoutImage) {
-								output.timeoutImage.fileName = `${testType}_${output.timeoutImage.fileName}`;
-								outputScreenshots([output.timeoutImage], timeoutErrorDirPath);
-								timeoutImagePath = path.join(timeoutErrorDirPath, output.timeoutImage.fileName);
-							}
 						}
-
 						reftestResultMap[testType][reftestEntryPath] = {
 							fileDiffs: diffs,
 							status: (output.status === "skipped-unsupported") ? "skipped" :

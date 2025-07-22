@@ -5,6 +5,7 @@ import type { TargetBinarySource } from "../../targetBinary/TargetBinarySource";
 import type { ExecutionMode } from "../../types/ExecutionMode";
 import type { Screenshot } from "../../types/Screenshot";
 import { createWaiter } from "../../util/createWaiter";
+import { extractDirname } from "../../util/extractDirname";
 import { withTimeLimit } from "../../util/timerUtil";
 import { createAppiumServer } from "../AppiumServer";
 import { createContentOutputReceiver } from "../createContentOutputReceiver";
@@ -18,6 +19,7 @@ const CONTENT_LIMIT_TIME = 300000; // コンテンツ実行時間の上限
 const ANDROID_ELEMENT_TIMEOUT = 10000; // Androidエミュレータの要素取得タイムアウト
 
 interface CreateAndroidScenarioRunnerParameterObject {
+	type: "android";
 	serveBinSrc: TargetBinarySource;
 	apkPath: string;
 	playlogClientPath: string;
@@ -77,13 +79,14 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 					appActivity: param.appActivity ?? undefined
 				}
 			});
+			let playCount = 0;
 			try {
 				if (mode === "replay") {
 					const modeButton = await client.$("id:active");
 					await assertDisplayed(modeButton, "mode button(id:active) is not displayed");
 					await modeButton.click();
 				}
-				for (let playCount = 0; playCount < playTimes; playCount++) {
+				for (; playCount < playTimes; playCount++) {
 					const contentWaiter = createWaiter();
 					contentOutputReceiver.onScreenshot.add(s => {
 						screenshots.push({
@@ -123,8 +126,16 @@ export async function createAndroidScenarioRunner(param: CreateAndroidScenarioRu
 					await assertDisplayed(stopButton, "stop button(id:stop) is not displayed");
 					await stopButton.click();
 				}
-				await client.deleteSession();
+			} catch (e) {
+				// エラーが発生した場合は、コンテンツのスクリーンショットを取得しておく
+				// TODO: この辺りのエラーハンドリングは他のScenarioRunnerとほぼ同じコードになっているので、「シナリオを実行してエラー時にスクリーンショットを撮る」一連の流れを共通化すべき
+				const screenshot: Screenshot = {
+					fileName: `${param.type}_error_try${playCount}_${extractDirname(scenarioPath)}.png`,
+					base64: await client.takeScreenshot()
+				};
+				return { status: "error", screenshot, error: e };
 			} finally {
+				await client.deleteSession();
 				await serveProcess.stop();
 				contentOutputReceiver.server.close();
 			}

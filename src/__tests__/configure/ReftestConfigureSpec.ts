@@ -23,6 +23,7 @@ describe("ReftestConfigure", () => {
 			expect(result.android).toBeNull();
 			expect(result.outputHtml).toBeNull();
 			expect(result.timeoutErrorDirPath).toBeNull();
+			expect(result.errorDiffDirPath).toBeNull();
 			expect(result.useNpmCache).toBeFalsy();
 			expect(result.npmCacheDir).toBe(path.resolve(".", "__bincache"));
 			expect(result.tempDownlodDir.indexOf(path.join(os.tmpdir(), "reftest_")) !== -1).toBeTruthy();
@@ -50,6 +51,29 @@ describe("ReftestConfigure", () => {
 			expect(result.threshold).toBe(0);
 			expect(result.outputHtml).toBeNull();
 			expect(result.timeoutErrorDirPath).toBeNull();
+			expect(result.errorDiffDirPath).toBeNull();
+			expect(result.useNpmCache).toBeFalsy();
+			expect(result.npmCacheDir).toBe(path.resolve(path.resolve(__dirname, "../fixture"), "__bincache"));
+			expect(result.tempDownlodDir.indexOf(path.join(os.tmpdir(), "reftest_")) !== -1).toBeTruthy();
+		});
+		test("設定ファイルの指定がある場合は設定ファイルで指定した値が返ってくる", () => {
+			const result = createReftestConfigure({ configure: path.resolve(__dirname, "../fixture/reftest.config.json") });
+			expect(result.testType).toBe("serve");
+			expect(result.targets).toEqual([path.resolve(__dirname, "../fixture/sample1/reftest.entry.json")]);
+			expect(result.update).toBeFalsy();
+			expect(result.updateDiff).toBeFalsy();
+			expect(result.sandboxVer).toBeNull();
+			expect(result.serveVer).toBeNull();
+			expect(result.sandboxPath).toBeNull();
+			expect(result.servePath).toBeNull();
+			expect(result.exportHtmlPath).toBeNull();
+			expect(result.exportZipPath).toBeNull();
+			expect(result.diffDirPath).toBeNull();
+			expect(result.errorDiffDirPath).toBeNull();
+			expect(result.threshold).toBe(0);
+			expect(result.outputHtml).toBeNull();
+			expect(result.timeoutErrorDirPath).toBeNull();
+			expect(result.errorScreenshotDirPath).toBeNull();
 			expect(result.useNpmCache).toBeFalsy();
 			expect(result.npmCacheDir).toBe(path.resolve(path.resolve(__dirname, "../fixture"), "__bincache"));
 			expect(result.tempDownlodDir.indexOf(path.join(os.tmpdir(), "reftest_")) !== -1).toBeTruthy();
@@ -90,9 +114,11 @@ describe("ReftestConfigure", () => {
 				playlogClientPath: path.resolve("/tmp/palylogClient.js"),
 				appActivity: "example.test",
 				appPackage: ".Example"
+
 			});
 			expect(result.outputHtml).toBeNull();
 			expect(result.timeoutErrorDirPath).toBeNull();
+			expect(result.errorScreenshotDirPath).toBeNull();
 			expect(result.useNpmCache).toBeFalsy();
 			expect(result.npmCacheDir).toBe(path.resolve(path.resolve(__dirname, "../fixture"), "__bincache"));
 			expect(result.tempDownlodDir.indexOf(path.join(os.tmpdir(), "reftest_")) !== -1).toBeTruthy();

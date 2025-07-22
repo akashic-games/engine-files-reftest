@@ -7,7 +7,7 @@ import type { ReftestMessageEvent, ScenarioMessageOption } from "../types/Scenar
 // 既存のtickListの第0tickにログ情報の出力先を指定したMessageEventを付与する
 export function injectOutputReceiverUrl(playlogJsonPath: string, url: string): string {
 	// シナリオファイルの動的読み込みのため、require の lint エラーを抑止
-	/* eslint-disable @typescript-eslint/no-require-imports */
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
 	const playlogJson = require(playlogJsonPath);
 	const tickList: pl.TickList = playlogJson.tickList;
 	const option: ScenarioMessageOption = {

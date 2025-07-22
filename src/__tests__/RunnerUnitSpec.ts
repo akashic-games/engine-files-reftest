@@ -225,6 +225,7 @@ describe("withRunnerUnit", () => {
 			android: null,
 			outputHtml: null,
 			timeoutErrorDirPath: null,
+			errorScreenshotDirPath: null,
 			useNpmCache: false,
 			npmCacheDir: path.resolve(".", ".npmcache"),
 			tempDownlodDir: path.resolve(".", ".npmcache")
