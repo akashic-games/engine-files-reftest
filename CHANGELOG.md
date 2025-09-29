@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## Unreleased changes
+* Android モードでローカルでインストール済みの appium を利用するように
+
 ## 3.3.29
 
 * akashic serve 環境で、passive モードのコンテンツのスクリーンショット画像の撮影領域がずれている問題の修正
