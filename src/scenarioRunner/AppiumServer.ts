@@ -1,5 +1,6 @@
 import type { ChildProcess} from "child_process";
 import { exec } from "child_process";
+import * as path from "path";
 import * as getPort from "get-port";
 import fetch from "node-fetch";
 import { untilResolve, withTimeLimit } from "../util/timerUtil";
@@ -25,8 +26,9 @@ export async function createAppiumServer(): Promise<AppiumServerProcess> {
 	const port = await getPort();
 	// appiumを利用するためにappiumサーバーを先に起動しておく必要がある
 	// appiumもバックグラウンドで起動したままにしておくため非同期で実行する
-	// 最新の2系だと現状のreftestでappiumが動作しないため1系を使う
-	const process = exec(`npx --no appium -p ${port}`); // 確実にローカルにインストールされているものを使うため、npx --noを利用
+	// appium は v1 系でなければならないことに注意。(v2 系には対応できていないことがわかっている)
+	const appiumPath = path.join(__dirname, "../../node_modules/.bin/appium");
+	const process = exec(`${appiumPath} -p ${port}`);
 	// appiumが起動するのを待つ
 	const checkStarting = async (resolve: (value?: unknown) => void, reject: (err?: Error) => void): Promise<void> => {
 		// Appiumが起動していることを確認するためのAPI実行
