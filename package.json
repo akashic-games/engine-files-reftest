@@ -1,6 +1,6 @@
 {
   "name": "@akashic/engine-files-reftest",
-  "version": "3.3.30-beta.1",
+  "version": "3.3.30-beta.2",
   "description": "akashicコンテンツの自動動作確認を行うリポジトリ",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
@@ -55,7 +55,7 @@
     "@akashic/amflow-util": "^1.4.0",
     "@akashic/game-configuration": "^2.1.0",
     "@akashic/trigger": "^2.1.0",
-    "appium": "^1.22.2",
+    "appium": "^1.22.3",
     "appium-uiautomator2-driver": "^1.75.0",
     "body-parser": "^1.19.1",
     "browserify": "^17.0.0",
