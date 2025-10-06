@@ -27,8 +27,7 @@ export async function createAppiumServer(): Promise<AppiumServerProcess> {
 	// appiumを利用するためにappiumサーバーを先に起動しておく必要がある
 	// appiumもバックグラウンドで起動したままにしておくため非同期で実行する
 	// appium は v1 系でなければならないことに注意。(v2 系には対応できていないことがわかっている)
-	const appiumPath = path.join(__dirname, "../../node_modules/.bin/appium");
-	const process = exec(`${appiumPath} -p ${port}`,
+	const process = exec(`npx appium -p ${port}`,
 		(error, stdout, stderr) => {
 			if (error) {
 				console.error(`exec error: ${error}`);
