@@ -1,6 +1,6 @@
 {
   "name": "@akashic/engine-files-reftest",
-  "version": "3.3.30-beta.3",
+  "version": "3.3.30-beta.4",
   "description": "akashicコンテンツの自動動作確認を行うリポジトリ",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
