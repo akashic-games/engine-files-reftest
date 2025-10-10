@@ -26,8 +26,20 @@ export async function createAppiumServer(): Promise<AppiumServerProcess> {
 	// appiumを利用するためにappiumサーバーを先に起動しておく必要がある
 	// appiumもバックグラウンドで起動したままにしておくため非同期で実行する
 	// appium は v1 系でなければならないことに注意。(v2 系には対応できていないことがわかっている)
-	//const appiumBinPath = require.resolve("appium");
-	const process = exec(`npx --no -- appium -p ${port}`);
+	// const appiumBinPath = require.resolve("appium");
+	console.log("_________NPX TEST_________");
+	const process = exec(`npx --no -c "appium -p ${port}"`, (error, stdout, stderr) => {
+		if (error) {
+			console.error(`exec error: ${error}`);
+			return;
+		}
+		if (stdout) {
+			console.log(`stdout: ${stdout}`);
+		}
+		if (stderr) {
+			console.log(`stderr: ${stderr}`);
+		}
+	});
 	// appiumが起動するのを待つ
 	const checkStarting = async (resolve: (value?: unknown) => void, reject: (err?: Error) => void): Promise<void> => {
 		// Appiumが起動していることを確認するためのAPI実行
