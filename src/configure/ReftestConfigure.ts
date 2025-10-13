@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import * as os from "os";
 import * as path from "path";
 
 const DEFAULT_REFTEST_CONFIGURE = "reftest.config.json";
@@ -88,6 +89,7 @@ export interface NormalizedReftestConfigure extends ReftestConfigure {
 	errorScreenshotDirPath: string | null;
 	useNpmCache: boolean;
 	npmCacheDir: string;
+	tempDownlodDir: string;
 }
 
 
@@ -129,7 +131,7 @@ export function createReftestConfigure(option: ReftestCommandOption): Normalized
 			timeoutErrorDirPath: null,
 			errorScreenshotDirPath: null,
 			useNpmCache: false,
-			npmCacheDir: null,
+			npmCacheDir: null
 		};
 	}
 	const dirPath = configurePath ? path.dirname(configurePath) : ".";
@@ -168,10 +170,16 @@ export function createReftestConfigure(option: ReftestCommandOption): Normalized
 		configure.android.appPackage = option.androidAppPackage ?? (configure.android.appPackage ?? null);
 		configure.android.appActivity = option.androidAppActivity ?? (configure.android.appActivity ?? null);
 	}
+
+	if (configure.npmCacheDir && !configure.useNpmCache) {
+		configure.useNpmCache = true;
+	}
+
 	const normalizedConfigure: NormalizedReftestConfigure = {
 		...configure,
 		threshold: configure.threshold ?? DEFAULT_IMAGE_DIFF_THRESHOLD,
-		npmCacheDir: configure.npmCacheDir ?? resolvePath(dirPath, "__bincache")! // resolvePath() は第2引数が string なら string を返す
+		npmCacheDir: configure.npmCacheDir ?? resolvePath(dirPath, "__bincache")!, // resolvePath() は第2引数が string なら string を返す
+		tempDownlodDir: fs.mkdtempSync(path.join(os.tmpdir(), "reftest_"))
 	};
 	return normalizedConfigure;
 }

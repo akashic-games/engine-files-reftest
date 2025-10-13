@@ -12,4 +12,5 @@ export interface StaticHostParameterObject {
 export interface StaticHost {
 	start(param: StaticHostParameterObject): Promise<StaticHostProcess>;
 	getVersionInfo(): string;
+	dispose(): void;
 }

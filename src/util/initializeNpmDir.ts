@@ -1,15 +1,13 @@
 import * as fs from "fs";
-import type { NormalizedReftestConfigure } from "../configure/ReftestConfigure";
 import { execCommand } from "./execCommand";
-// キャッシュディレクトリを初期化する関数
-export function initializeNpmDir(configure: NormalizedReftestConfigure): void {
-	const npmCacheDir = configure.npmCacheDir;
-	if (fs.existsSync(npmCacheDir))fs.rmdirSync(npmCacheDir, { recursive: true });
+// npm install するディレクトリを初期化する関数
+export function initializeNpmDir(installDir: string): void {
+	if (fs.existsSync(installDir)) fs.rmdirSync(installDir, { recursive: true });
 	console.log("Binary cache has been cleared");
-	fs.mkdirSync(npmCacheDir, { recursive: true });
+	fs.mkdirSync(installDir, { recursive: true });
 	const cwd = process.cwd();
 	try {
-		process.chdir(npmCacheDir);
+		process.chdir(installDir);
 		execCommand("npm init -y");
 	} finally {
 		process.chdir(cwd);

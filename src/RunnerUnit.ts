@@ -90,11 +90,7 @@ interface GetRunnerUnitParameterObject {
 
 export async function withRunnerUnit<T>(param: GetRunnerUnitParameterObject, fun: (ru: RunnerUnit) => Promise<T>): Promise<T> {
 	const runnerUnit = await getRunnerUnit(param);
-	try {
-		return await fun(runnerUnit);
-	} finally {
-		await runnerUnit.dispose();
-	}
+	return await fun(runnerUnit);
 }
 
 async function getRunnerUnit(param: GetRunnerUnitParameterObject): Promise<RunnerUnit> {
@@ -102,19 +98,30 @@ async function getRunnerUnit(param: GetRunnerUnitParameterObject): Promise<Runne
 	let preprocessor: Preprocessor | null = null;
 	let audioExtractor: AudioExtractor | null = null;
 
+	const versionLatest = "latest";
 	// npmCacheDir にはデフォルトパスがあるので、nullにはならない想定
-	const downloadDirPath = path.resolve(param.configure.npmCacheDir);
+	const serveDownloadDirPath = path.join(path.resolve(param.configure.tempDownlodDir), "serve");
 	const serveBinSrc: TargetBinarySource = param.configure.servePath ?
 		{ type: "local", path: path.resolve(param.configure.servePath) } :
-		{ type: "published", downloadDirPath: downloadDirPath };
-	if (param.configure.serveVer && serveBinSrc.type === "published") {
-		serveBinSrc.version = param.configure.serveVer;
-	}
+		{
+			type: "published",
+			downloadDirPath: serveDownloadDirPath,
+			useNpmCache: param.configure.useNpmCache,
+			npmCacheDir: path.join(param.configure.npmCacheDir, "serve"),
+			version: param.configure.serveVer ?? versionLatest
+		};
 	switch (param.testType) {
 		case "sandbox":
+			const sandboxDownloadDirPath = path.join(path.resolve(param.configure.tempDownlodDir), "sandbox");
 			const sandboxBinSrc: TargetBinarySource = param.configure.sandboxPath ?
 				{ type: "local", path: path.resolve(param.configure.sandboxPath) } :
-				{ type: "published", downloadDirPath: downloadDirPath };
+				{
+					type: "published",
+					downloadDirPath: sandboxDownloadDirPath,
+					useNpmCache: param.configure.useNpmCache,
+					npmCacheDir: path.join(param.configure.npmCacheDir, "sandbox"),
+					version: param.configure.sandboxVer ?? versionLatest
+				};
 			if (param.configure.sandboxVer && sandboxBinSrc.type === "published") {
 				sandboxBinSrc.version = param.configure.sandboxVer;
 			}
@@ -126,16 +133,30 @@ async function getRunnerUnit(param: GetRunnerUnitParameterObject): Promise<Runne
 			audioExtractor = await createServeAudioExtractor(serveBinSrc);
 			break;
 		case "export-zip":
+			const exportZipDownloadDirPath = path.join(path.resolve(param.configure.tempDownlodDir), "export-zip");
 			const exportZipBinarySource: TargetBinarySource = param.configure.exportZipPath ?
 				{ type: "local", path: path.resolve(param.configure.exportZipPath) } :
-				{ type: "published", downloadDirPath: downloadDirPath };
+				{
+					type: "published",
+					downloadDirPath: exportZipDownloadDirPath,
+					useNpmCache:  param.configure.useNpmCache,
+					npmCacheDir: path.join(param.configure.npmCacheDir, "export-zip"),
+					version: versionLatest
+				};
 			preprocessor = await createExportZipPreprocessor(exportZipBinarySource);
 			scenarioRunner = await createServeScenarioRunner({ type: "export-zip", binSrc: serveBinSrc });
 			break;
 		case "export-html":
+			const exportHtmlDownloadDirPath = path.join(path.resolve(param.configure.tempDownlodDir), "export-html");
 			const exportHtmlBinarySource: TargetBinarySource = param.configure.exportHtmlPath ?
 				{ type: "local", path: path.resolve(param.configure.exportHtmlPath) } :
-				{ type: "published", downloadDirPath: downloadDirPath };
+				{
+					type: "published",
+					downloadDirPath: exportHtmlDownloadDirPath,
+					useNpmCache:  param.configure.useNpmCache,
+					npmCacheDir: path.join(param.configure.npmCacheDir, "export-html"),
+					version: versionLatest
+				};
 			preprocessor = await createExportHtmlPreprocessor(exportHtmlBinarySource);
 			const staticHttpServe = new StaticHttpServe();
 			scenarioRunner = await createStaticHostScenarioRunner({ type: "export-html", hostBin: staticHttpServe });

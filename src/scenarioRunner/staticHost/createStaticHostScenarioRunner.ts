@@ -86,7 +86,7 @@ export async function createStaticHostScenarioRunner(param: CreateStaticHostScen
 			return { status: "succeeded", screenshots };
 		},
 		dispose: async (): Promise<void> => {
-			// do nothing
+			param.hostBin.dispose();
 		},
 		getVersionInfo: (): string => {
 			return param.hostBin.getVersionInfo();

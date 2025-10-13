@@ -10,6 +10,7 @@ import type { NormalizedReftestEntry, ReftestEntry } from "./configure/ReftestEn
 import { normalizeReftestEntry } from "./configure/ReftestEntry";
 import { renderHtmlReport } from "./outputResult/renderHtmlReport";
 import { renderHtmlReportIndex } from "./outputResult/renderHtmlReportIndex";
+import type { RunnerUnit} from "./RunnerUnit";
 import { withRunnerUnit } from "./RunnerUnit";
 import type { ReftestOutputWithScreenshots } from "./scenarioRunner/ScenarioRunner";
 import type { ReftestMode } from "./types/ReftestMode";
@@ -17,9 +18,7 @@ import type { ReftestResult } from "./types/ReftestResult";
 import type { Screenshot } from "./types/Screenshot";
 import { createConfigureHash } from "./util/createConfigureHash";
 import { diffDirectory } from "./util/diffDirectory";
-import { existCaches } from "./util/existCaches";
 import type { FileDiff } from "./util/FileDiff";
-import { initializeNpmDir } from "./util/initializeNpmDir";
 import { mkdirpSync } from "./util/mkdirpSync";
 import { resolveRootDirPath } from "./util/resolveRootDirPath";
 
@@ -89,14 +88,12 @@ void (async () => {
 			htmlReportDir = path.resolve(configure.outputHtml);
 			mkdirpSync(htmlReportDir);
 		}
-		// バイナリのキャッシュを使用しない、または、使用するキャッシュが存在しない場合、キャッシュを初期化
-		if (!configure.useNpmCache || !existCaches(configure, targetTestTypes)) {
-			initializeNpmDir(configure);
-		}
 
+		const runnerUnitList: RunnerUnit[] = [];
 		for (const testType of targetTestTypes) {
 			reftestResultMap[testType] = Object.create(null);
 			await withRunnerUnit<void>({testType, configure}, async (runnerUnit) => {
+				runnerUnitList.push(runnerUnit);
 				for (const reftestEntry of reftestEntries) {
 					const configureHash = createConfigureHash(reftestEntry);
 					const configureHashPath = path.resolve(reftestEntry.expectedDirPath, "__hash__");
@@ -198,6 +195,9 @@ void (async () => {
 					}
 				}
 			});
+		}
+		for (const unit of runnerUnitList) {
+			await unit.dispose();
 		}
 		// 正解画像更新のみであればテスト結果の出力・検証をする必要はないのでここで処理を終了する。
 		if (mode === "update-expected" || mode === "update-expected-only-diff") {
