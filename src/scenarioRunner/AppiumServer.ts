@@ -25,7 +25,8 @@ export async function createAppiumServer(): Promise<AppiumServerProcess> {
 	const port = await getPort();
 	// appiumを利用するためにappiumサーバーを先に起動しておく必要がある
 	// appiumもバックグラウンドで起動したままにしておくため非同期で実行する
-	// appium は v1 系でなければならないことに注意。(v2 系には対応できていないことがわかっている)
+	// appium は v1 系でなければならないことに注意 (v2 系には対応できていないことがわかっている)
+	// 暗黙にインストールされるのを避けるため npx を使っていないことに注意 (npx --no でも良いがなぜか Github Actions でエラーになるので使っていない)
 	const appiumBinPath = require.resolve("appium");
 	const process = exec(`${appiumBinPath} -p ${port}`);
 	// appiumが起動するのを待つ
