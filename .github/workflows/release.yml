@@ -31,6 +31,6 @@ jobs:
           npm ci
           npm test
       - name: Publish and Release
-        uses: akashic-games/action-release@c42437a8b7a6cd446c76f522ffc67d20071f9827 # v3.0.1
+        uses: akashic-games/action-release@c983a3f85d6d11b69c7525db28cfdd34466ac778 # v3.0.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
