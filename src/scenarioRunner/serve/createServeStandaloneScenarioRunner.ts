@@ -39,15 +39,14 @@ export async function createServeStandaloneScenarioRunner(
 				executablePath: process.env.CHROME_BIN || undefined,
 				args: ["--no-sandbox", "--headless", "--disable-gpu", "--disable-dev-shm-usage"]
 			});
-			let page: puppeteer.Page | null = null;
+			const page: puppeteer.Page = await browser.newPage();
 			let playCount = 0;
 			try {
+				// デバッグ用にコンテンツのコンソールログを表示できるように
+				page.on("console", msg => {
+					console.log("ServeStandaloneScenarioRunner: ", msg.text().trimEnd());
+				});
 				for (; playCount < playTimes; playCount++) {
-					page = await browser.newPage();
-					// デバッグ用にコンテンツのコンソールログを表示できるように
-					page.on("console", msg => {
-						console.log("ServeStandaloneScenarioRunner: ", msg.text().trimEnd());
-					});
 					await page.goto(serveProcess.url);
 					// 稀に終了メッセージを流す前にコンテンツが終了することがあるため、コンテンツが確実に終了している時間を経過したら強制的に待機を解除する処理を用意した
 					await withTimeLimit(CONTENT_LIMIT_MAX_TIME, "content did not end in time", () => {
@@ -56,9 +55,8 @@ export async function createServeStandaloneScenarioRunner(
 						// ウィンドウサイズをコンテンツのサイズとピッタリ同じにすると、ツールバーなどの要素が重なってしまうため、少し余白を持たせる
 						const margin = 100;
 						const viewport = { width: gameJson.width + margin, height: gameJson.height + margin };
-						// この時点で、page は代入済みのはず
 						return evaluateScenarioByPuppeteer(
-							page!,
+							page,
 							scenarioPath,
 							(s: Screenshot) => {
 								screenshots.push({
@@ -70,28 +68,24 @@ export async function createServeStandaloneScenarioRunner(
 							viewport
 						);
 					});
-					await page.close();
 				}
 			} catch (e) {
 				// TODO: この辺りのエラーハンドリングは他のScenarioRunnerとほぼ同じコードになっているので、「シナリオを実行してエラー時にスクリーンショットを撮る」一連の流れを共通化すべき
 				if (e instanceof TimeoutError) {
 					const screenshot: Screenshot = {
 						fileName: `${param.type}_timeout_try${playCount}_${extractDirname(scenarioPath)}.png`,
-						base64: await page!.screenshot({ encoding: "base64" }) // TimeoutError は withTimeLimit() から来るので、page は代入済みのはず
+						base64: await page.screenshot({ encoding: "base64" })
 					};
 					return { status: "timeout", screenshot };
 				} else {
-					if (page && !page.isClosed()) {
-						const screenshot: Screenshot = {
-							fileName: `${param.type}_error_try${playCount}_${extractDirname(scenarioPath)}.png`,
-							base64: await page.screenshot({ encoding: "base64" })
-						};
-						return { status: "error", screenshot, error: e };
-					}
-					throw e;
+					const screenshot: Screenshot = {
+						fileName: `${param.type}_error_try${playCount}_${extractDirname(scenarioPath)}.png`,
+						base64: await page.screenshot({ encoding: "base64" })
+					};
+					return { status: "error", screenshot, error: e };
 				}
 			} finally {
-				if (page && !page.isClosed()) await page.close();
+				await page.close();
 				await browser.close();
 				await serveProcess.stop();
 			}
