@@ -111,7 +111,7 @@ async function getRunnerUnit(param: GetRunnerUnitParameterObject): Promise<Runne
 		serveBinSrc.version = param.configure.serveVer;
 	}
 	switch (param.testType) {
-		case "sandbox":
+		case "sandbox-classic":
 			const sandboxBinSrc: TargetBinarySource = param.configure.sandboxPath ?
 				{ type: "local", path: path.resolve(param.configure.sandboxPath) } :
 				{ type: "published", downloadDirPath: downloadDirPath };
@@ -120,6 +120,11 @@ async function getRunnerUnit(param: GetRunnerUnitParameterObject): Promise<Runne
 			}
 			const sandbox = await createAkashicSandbox(sandboxBinSrc);
 			scenarioRunner = await createStaticHostScenarioRunner({ type: "sandbox", hostBin: sandbox });
+			break;
+		case "sandbox":
+		case "serve-standalone":
+			scenarioRunner = await createServeScenarioRunner({ type: "serve-standalone", binSrc: serveBinSrc });
+			audioExtractor = await createServeAudioExtractor(serveBinSrc);
 			break;
 		case "serve":
 			scenarioRunner = await createServeScenarioRunner({ type: "serve", binSrc: serveBinSrc });

@@ -238,9 +238,25 @@ describe("withRunnerUnit", () => {
 			return Promise.resolve();
 		});
 	});
+	test("testTypeがsandboxの場合、createServeScenarioRunner関数とcreateWebbrowserAudioExtractor関数が実行される", async () => {
+		await withRunnerUnit({testType: "sandbox", configure: reftestConfigure}, () => {
+			expect(screnarioRunnerStr).toBe("serve");
+			expect(preprocessorStr).toBeNull();
+			expect(createServeAudioExtractor).toHaveBeenCalledTimes(1);
+			return Promise.resolve();
+		});
+	});
+	test("testTypeがserve-standaloneの場合、createServeScenarioRunner関数とcreateWebbrowserAudioExtractor関数が実行される", async () => {
+		await withRunnerUnit({testType: "serve-standalone", configure: reftestConfigure}, () => {
+			expect(screnarioRunnerStr).toBe("serve");
+			expect(preprocessorStr).toBeNull();
+			expect(createServeAudioExtractor).toHaveBeenCalledTimes(1);
+			return Promise.resolve();
+		});
+	});
 	// createAkashicSandbox() 実行時に存在しないパスを参照しにいき必ずエラーになるためここだけテストを無効化している
 	// TODO: createAkashicSandbox()のモック化もしくはエラーが出ないようにする
-	xtest("testTypeがsandboxの場合、createStaticHostScenarioRunner関数が実行される", async () => {
+	xtest("testTypeがsandbox-classicの場合、createStaticHostScenarioRunner関数が実行される", async () => {
 		await withRunnerUnit({testType: "sandbox", configure: reftestConfigure}, () => {
 			expect(screnarioRunnerStr).toBe("static-host");
 			expect(preprocessorStr).toBeNull();

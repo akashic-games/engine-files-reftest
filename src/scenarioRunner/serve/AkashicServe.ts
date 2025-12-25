@@ -77,6 +77,10 @@ export class AkashicServe {
 		this._binFile.dispose();
 	}
 
+	getVersion(): string {
+		return this._version;
+	}
+
 	getVersionInfo(): string {
 		return `serve@${this._version}`;
 	}
