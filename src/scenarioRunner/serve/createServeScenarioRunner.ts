@@ -18,7 +18,7 @@ import { createAkashicServe } from "./AkashicServe";
 const CONTENT_LIMIT_MAX_TIME = 300000;
 
 interface CreateServeScenarioRunnerParameterObject {
-	type: "serve" | "serve-standalone" | "export-zip";
+	type: "serve" | "export-zip";
 	binSrc: TargetBinarySource;
 }
 
@@ -31,20 +31,13 @@ export async function createServeScenarioRunner(param: CreateServeScenarioRunner
 			mode: ExecutionMode,
 			playTimes: number
 		): Promise<ReftestOutput> => {
-			if (
-				param.type === "serve-standalone"
-				&& (mode === "replay" || Number(serveBin.getVersion().split(".")[0]) < 2)
-			) {
-				return { status: "skipped-unsupported", screenshots: [] };
-			}
 			const screenshots: Screenshot[] = [];
 			const contentOutputReceiver = await createContentOutputReceiver("localhost");
 			const consoleApiUrl = `${contentOutputReceiver.url}/console`;
 			const playlogJsonPath = injectOutputReceiverUrl(scenarioPath, consoleApiUrl);
 			// reftest実行時のoriginがnullになってしまうため、--cors-allow-originに*を指定している
 			// TODO: *ではなくURL指定にする
-			const serveOptions = mode === "replay" ? ["--cors-allow-origin", "*", "--debug-playlog", playlogJsonPath] :
-				(param.type === "serve-standalone" ? ["--standalone"] : []);
+			const serveOptions = mode === "replay" ? ["--cors-allow-origin", "*", "--debug-playlog", playlogJsonPath] : [];
 			const serveProcess = await serveBin.start({ contentDirPath, hostname: "localhost", options: serveOptions });
 			const browser = await puppeteer.launch({
 				headless: true,

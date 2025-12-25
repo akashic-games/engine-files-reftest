@@ -11,6 +11,7 @@ import { createAndroidScenarioRunner } from "./scenarioRunner/android/createAndr
 import { injectReftestHelper, injectScripts } from "./scenarioRunner/injectToContent";
 import type { ReftestOutput, ScenarioRunner } from "./scenarioRunner/ScenarioRunner";
 import { createServeScenarioRunner } from "./scenarioRunner/serve/createServeScenarioRunner";
+import { createServeStandaloneScenarioRunner } from "./scenarioRunner/serve/createServeStandaloneScenarioRunner";
 import { createAkashicSandbox } from "./scenarioRunner/staticHost/AkashicSandbox";
 import { createStaticHostScenarioRunner } from "./scenarioRunner/staticHost/createStaticHostScenarioRunner";
 import { StaticHttpServe } from "./scenarioRunner/staticHost/StaticHttpServe";
@@ -123,8 +124,7 @@ async function getRunnerUnit(param: GetRunnerUnitParameterObject): Promise<Runne
 			break;
 		case "sandbox":
 		case "serve-standalone":
-			scenarioRunner = await createServeScenarioRunner({ type: "serve-standalone", binSrc: serveBinSrc });
-			audioExtractor = await createServeAudioExtractor(serveBinSrc);
+			scenarioRunner = await createServeStandaloneScenarioRunner({ type: "serve-standalone", binSrc: serveBinSrc });
 			break;
 		case "serve":
 			scenarioRunner = await createServeScenarioRunner({ type: "serve", binSrc: serveBinSrc });
