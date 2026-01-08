@@ -4,12 +4,12 @@ import * as path from "path";
 const DEFAULT_REFTEST_CONFIGURE = "reftest.config.json";
 
 export const DEFAULT_IMAGE_DIFF_THRESHOLD = 0;
-export const TEST_TYPES = ["sandbox", "serve", "export-zip", "export-html", "android"] as const;
+export const TEST_TYPES = ["sandbox", "sandbox-classic", "serve", "serve-standalone", "export-zip", "export-html", "android"] as const;
 export type TestType = typeof TEST_TYPES[number];
 export type CommandOptionTestType = TestType | "all" | "all-pc";
 
 export const testTypesAll: TestType[] = [...TEST_TYPES];
-export const testTypesAllPc: TestType[] = ["sandbox", "serve", "export-zip", "export-html"];
+export const testTypesAllPc: TestType[] = ["serve", "sandbox", "export-zip", "export-html"];
 
 export interface ReftestCommandOption {
 	configure?: string;

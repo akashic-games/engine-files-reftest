@@ -11,6 +11,7 @@ import { createAndroidScenarioRunner } from "./scenarioRunner/android/createAndr
 import { injectReftestHelper, injectScripts } from "./scenarioRunner/injectToContent";
 import type { ReftestOutput, ScenarioRunner } from "./scenarioRunner/ScenarioRunner";
 import { createServeScenarioRunner } from "./scenarioRunner/serve/createServeScenarioRunner";
+import { createServeStandaloneScenarioRunner } from "./scenarioRunner/serve/createServeStandaloneScenarioRunner";
 import { createAkashicSandbox } from "./scenarioRunner/staticHost/AkashicSandbox";
 import { createStaticHostScenarioRunner } from "./scenarioRunner/staticHost/createStaticHostScenarioRunner";
 import { StaticHttpServe } from "./scenarioRunner/staticHost/StaticHttpServe";
@@ -111,7 +112,7 @@ async function getRunnerUnit(param: GetRunnerUnitParameterObject): Promise<Runne
 		serveBinSrc.version = param.configure.serveVer;
 	}
 	switch (param.testType) {
-		case "sandbox":
+		case "sandbox-classic":
 			const sandboxBinSrc: TargetBinarySource = param.configure.sandboxPath ?
 				{ type: "local", path: path.resolve(param.configure.sandboxPath) } :
 				{ type: "published", downloadDirPath: downloadDirPath };
@@ -120,6 +121,10 @@ async function getRunnerUnit(param: GetRunnerUnitParameterObject): Promise<Runne
 			}
 			const sandbox = await createAkashicSandbox(sandboxBinSrc);
 			scenarioRunner = await createStaticHostScenarioRunner({ type: "sandbox", hostBin: sandbox });
+			break;
+		case "sandbox":
+		case "serve-standalone":
+			scenarioRunner = await createServeStandaloneScenarioRunner({ type: "serve-standalone", binSrc: serveBinSrc });
 			break;
 		case "serve":
 			scenarioRunner = await createServeScenarioRunner({ type: "serve", binSrc: serveBinSrc });

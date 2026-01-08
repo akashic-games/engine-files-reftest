@@ -1,11 +1,11 @@
 import * as fs from "fs";
 import * as path from "path";
-import type { NormalizedReftestConfigure } from "../configure/ReftestConfigure";
+import type { NormalizedReftestConfigure, TestType } from "../configure/ReftestConfigure";
 
 // 指定したテストタイプのキャッシュが存在するか判定する関数
 // 存在する場合には、 configure の値をそのパスへ破壊的に変更する
 export function existCaches(
-	configure: NormalizedReftestConfigure, targetTestTypes: Readonly<"sandbox" | "serve" | "export-zip" | "export-html" | "android">[]
+	configure: NormalizedReftestConfigure, targetTestTypes: Readonly<TestType>[]
 ): boolean {
 	// TODO: キャッシュ周りを抜本的に見直す。少なくとも以下の点を改める:
 	//  - 名前に反して破壊的に値を書き換えている
