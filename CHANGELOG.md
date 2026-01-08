@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 3.4.0
+
+* `test-type` に "serve-standalone" と "sandbox-classic" を追加
+  * "serve-standalone" では `akashic serve --standalone` を実行するように
+  * "sandbox-classic" では　`akashic sandbox` を実行するように
+* `test-type: sandbox` を `test-type: serve-standalone` のエイリアスに変更
+
 ## 3.3.33
 
 * 変更内容なし (npm publish のテスト実行のためバージョン更新)
