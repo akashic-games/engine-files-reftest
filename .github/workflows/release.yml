@@ -4,6 +4,17 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      suppress_release_creation:
+        description: Suppress a release creation
+        required: false
+        type: boolean
+        default: false
+      target_tag:
+        description: Tag name when publishing package
+        required: false
+        default: "latest"
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
@@ -31,6 +42,8 @@ jobs:
           npm ci
           npm test
       - name: Publish and Release
-        uses: akashic-games/action-release@c983a3f85d6d11b69c7525db28cfdd34466ac778 # v3.0.2
+        uses: akashic-games/action-release@a81329f4a70100c4729df80dba17ec8d5da52511 # v3.1.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          suppress_release_creation: "${{ github.event.inputs.suppress_release_creation || false }}"
+          target_tag: ${{ github.event.inputs.target_tag || 'latest' }}
