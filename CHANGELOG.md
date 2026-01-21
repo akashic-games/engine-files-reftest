@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.4.1-beta.1
+* `@akashic/engine-files-reftest-helper` を更新
+
 ## 3.4.1-beta.0
 * `@akashic/engine-files-reftest-helper` を更新
 

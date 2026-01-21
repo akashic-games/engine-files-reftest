@@ -1,6 +1,6 @@
 {
   "name": "@akashic/engine-files-reftest",
-  "version": "3.4.1-beta.0",
+  "version": "3.4.1-beta.1",
   "description": "akashicコンテンツの自動動作確認を行うリポジトリ",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
@@ -71,7 +71,7 @@
     "pixelmatch": "^5.1.0",
     "puppeteer": "^2.0.0",
     "puppeteer-stream": "2.1.1",
-    "reftest-helper": "npm:@akashic/engine-files-reftest-helper@next",
+    "reftest-helper": "npm:@akashic/engine-files-reftest-helper@1.3.0-beta.1",
     "reftest-helper-for-ae1x": "npm:@akashic/engine-files-reftest-helper@for_ae1x",
     "serve-handler": "^6.1.3",
     "sharp": "^0.32.6",
