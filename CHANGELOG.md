@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.4.1-beta.2
+* デバッグ用に差し込むスクリプトを出力するように
+
 ## 3.4.1-beta.1
 * `@akashic/engine-files-reftest-helper` を更新
 
