@@ -33,7 +33,6 @@ export function injectScripts(dirPath: string, scriptPaths: string[]): void {
 }
 
 function injectScriptToEntryPoint(dirPath: string, script: string): void {
-	console.log(script);
 	// scriptをエントリポイントに差し込む処理
 	// game.jsonの動的読み込みのため、require の lint エラーを抑止
 	// eslint-disable-next-line @typescript-eslint/no-require-imports
