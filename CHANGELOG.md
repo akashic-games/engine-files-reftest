@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.4.1
+
+* `reftest-helper` を最新バージョンに更新
+
 ## 3.4.0
 
 * `test-type` に "serve-standalone" と "sandbox-classic" を追加
