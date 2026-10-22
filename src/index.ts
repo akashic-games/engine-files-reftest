@@ -130,7 +130,7 @@ void (async () => {
 					}
 					if (mode === "update-expected" || mode === "update-expected-only-diff") {
 						if (fs.existsSync(expectedDir)) {
-							fs.rmdirSync(expectedDir, { recursive: true }); // 前回のテスト結果が残っていたら消す
+							fs.rmSync(expectedDir, { recursive: true }); // 前回のテスト結果が残っていたら消す
 						}
 						// 上記のエラー処理でoutputの型がReftestOutputWithScreenshotsであることは保証されている
 						outputScreenshots((output as ReftestOutputWithScreenshots).screenshots, expectedDir);
@@ -194,7 +194,7 @@ void (async () => {
 						}
 
 						if (fs.existsSync(outputDir))
-							fs.rmdirSync(outputDir, { recursive: true }); // TODO: tmpファイルを削除するオプションを用意して、そのオプションが指定された時のみ削除するように
+							fs.rmSync(outputDir, { recursive: true }); // TODO: tmpファイルを削除するオプションを用意して、そのオプションが指定された時のみ削除するように
 					}
 				}
 			});

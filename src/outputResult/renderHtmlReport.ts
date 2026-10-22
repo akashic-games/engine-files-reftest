@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as cpx from "cpx";
 import * as ejs from "ejs";
-import * as sharp from "sharp";
+import sharp from "sharp";
 import type { ReftestResult } from "../types/ReftestResult";
 import { mkdirpSync } from "../util/mkdirpSync";
 
