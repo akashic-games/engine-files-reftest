@@ -4,7 +4,7 @@ import { execCommand } from "./execCommand";
 // キャッシュディレクトリを初期化する関数
 export function initializeNpmDir(configure: NormalizedReftestConfigure): void {
 	const npmCacheDir = configure.npmCacheDir;
-	if (fs.existsSync(npmCacheDir))fs.rmdirSync(npmCacheDir, { recursive: true });
+	if (fs.existsSync(npmCacheDir)) fs.rmSync(npmCacheDir, { recursive: true });
 	console.log("Binary cache has been cleared");
 	fs.mkdirSync(npmCacheDir, { recursive: true });
 	const cwd = process.cwd();

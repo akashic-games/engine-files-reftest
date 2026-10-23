@@ -4,7 +4,9 @@
     "lib": ["dom"],
     "declaration": false,
     "noImplicitAny": true,
-    "module": "commonjs",
+    "module": "node16",
+    "moduleResolution": "node16",
+    "esModuleInterop": true,
     "outDir": "lib",
     "strict": true,
     "downlevelIteration": true

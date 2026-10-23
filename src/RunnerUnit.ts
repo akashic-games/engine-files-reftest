@@ -44,7 +44,7 @@ export class RunnerUnit {
 			contentDirPath = await this.preprocessor.run(path.resolve(contentDirPath));
 			// preprocessor実行前のcontentDirPathは以降不要になるのでここで削除する
 			// TODO: tmpファイルを削除するオプションを用意して、そのオプションが指定された時のみ削除するように
-			fs.rmdirSync(oldDirPath, { recursive: true });
+			fs.rmSync(oldDirPath, { recursive: true });
 		}
 		console.log(`contents : ${entry.selfPath}`);
 		console.log(`scenario : ${entry.scenario.path}`);
@@ -64,7 +64,7 @@ export class RunnerUnit {
 		}
 		// 一時的に用意したcontentDirPathは以降不要になるのでここで削除する
 		// TODO: tmpファイルを削除するオプションを用意して、そのオプションが指定された時のみ削除するように
-		fs.rmdirSync(contentDirPath, { recursive: true });
+		fs.rmSync(contentDirPath, { recursive: true });
 		return ret;
 	}
 

@@ -17,7 +17,7 @@ let preprocessorStr: string | null;
 // TODO: ここでモックしているものの単体テストを行い、モックを減らしていく
 jest.mock("fs", () => {
 	return {
-		rmdirSync: (_path: string): void => {
+		rmSync: (_path: string): void => {
 			// do nothing
 		}
 	};

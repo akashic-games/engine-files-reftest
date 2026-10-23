@@ -1,4 +1,4 @@
-import * as puppeteer from "puppeteer";
+import puppeteer from "puppeteer";
 import type { ExecutionMode } from "../../types/ExecutionMode";
 import type { Screenshot } from "../../types/Screenshot";
 import { extractDirname } from "../../util/extractDirname";

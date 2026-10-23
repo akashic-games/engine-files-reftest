@@ -1,9 +1,9 @@
 import type * as http from "http";
 import { Trigger } from "@akashic/trigger";
 import * as bodyParser from "body-parser";
-import * as cors from "cors";
-import * as express from "express";
-import * as getPort from "get-port";
+import cors from "cors";
+import express from "express";
+import getPort from "get-port";
 import type { ConsoleApiParameter } from "reftest-helper/lib/types";
 import type { Screenshot } from "../types/Screenshot";
 

@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { calculateFinishedTime } from "@akashic/amflow-util/lib/calculateFinishedTime";
-import * as puppeteer from "puppeteer";
+import puppeteer from "puppeteer";
 import type { TargetBinarySource } from "../../targetBinary/TargetBinarySource";
 import type { ExecutionMode } from "../../types/ExecutionMode";
 import type { Screenshot } from "../../types/Screenshot";
