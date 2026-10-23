@@ -1,4 +1,4 @@
-import * as browserify from "browserify";
+import browserify from "browserify";
 
 /**
  * 指定されたエントリポイントのbundle済みソースコードを返す
