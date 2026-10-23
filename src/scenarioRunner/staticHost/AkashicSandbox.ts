@@ -1,6 +1,6 @@
 import type { ChildProcess } from "child_process";
 import { spawn } from "child_process";
-import * as getPort from "get-port";
+import getPort from "get-port";
 import fetch from "node-fetch";
 import type { TargetBinaryFile } from "../../targetBinary/TargetBinaryFile";
 import { createTargetBinaryFile } from "../../targetBinary/TargetBinaryFile";

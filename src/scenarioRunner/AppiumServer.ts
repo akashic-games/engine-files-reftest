@@ -1,6 +1,6 @@
 import type { ChildProcess} from "child_process";
 import { exec } from "child_process";
-import * as getPort from "get-port";
+import getPort from "get-port";
 import fetch from "node-fetch";
 import { untilResolve, withTimeLimit } from "../util/timerUtil";
 

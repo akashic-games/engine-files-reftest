@@ -1,5 +1,5 @@
 import * as http from "http";
-import * as getPort from "get-port";
+import getPort from "get-port";
 import type { StaticHost, StaticHostParameterObject, StaticHostProcess } from "./StaticHost";
 
 // @types/serve-handlerを利用するためにはesModuleInteropを有効にする必要があるが、その場合他箇所のビルドにも影響が出るためrequireを使用

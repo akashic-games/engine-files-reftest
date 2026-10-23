@@ -1,10 +1,10 @@
 import * as fs from "fs";
 import type * as http from "http";
 import * as path from "path";
-import * as cors from "cors";
-import * as express from "express";
-import * as getPort from "get-port";
-import * as puppeteer from "puppeteer";
+import cors from "cors";
+import express from "express";
+import getPort from "get-port";
+import puppeteer from "puppeteer";
 import { untilResolve } from "../util/timerUtil";
 
 export interface AudioWaveformPageHost {
